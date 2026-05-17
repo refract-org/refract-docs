@@ -4,6 +4,8 @@
 
 A signed evidence bundle contains all events for a page observation along with a SHA-256 hash of the complete payload. The hash lets downstream consumers verify that the data hasn't been modified since export.
 
+![Merkle tree verification](merkle-tree.svg)
+
 ```bash
 refract export "Earth" --bundle > earth-bundle.json
 ```

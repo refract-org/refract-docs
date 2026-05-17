@@ -33,9 +33,10 @@ docs/
 
 ## Copy conventions
 
-- Use `Refract` (capital V) as the project name.
+- Use `Refract` (capital R) as the project name. Always use `Refract`, never `Varia`.
 - Reference packages as `@refract-org/<name>`.
-- Reference the CLI as `refract` (`wikihistory` works as an alias)
+- Reference the CLI as `refract` (`wikihistory` works as a backward-compat alias).
+- Use `refract` as the command name in all code examples.
 - Describe Refract as a deterministic observation engine.
 - L1/L2/L3 references are legacy — prefer "deterministic" / "ground truth".
 

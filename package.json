@@ -3,15 +3,15 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "Public documentation for Varia — the open-source deterministic observation engine for public revision histories",
+  "description": "Public documentation for Refract — the open-source deterministic observation engine for public revision histories",
   "license": "CC-BY-4.0",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/var-ia/varia-docs.git"
+    "url": "git+https://github.com/refract-org/refract-docs.git"
   },
-  "homepage": "https://var-ia.github.io/varia-docs/",
+  "homepage": "https://refract-org.github.io/refract-docs/",
   "bugs": {
-    "url": "https://github.com/var-ia/varia-docs/issues"
+    "url": "https://github.com/refract-org/refract-docs/issues"
   },
   "scripts": {
     "build": "node build.mjs"

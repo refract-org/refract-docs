@@ -1,68 +1,244 @@
-///
-/// # Refract Analysis — {{PAGE_TITLE}}
-///
-/// This notebook loads events from `{{PAGE_TITLE}}` and visualizes the
-/// claim lifecycle, citation churn, and event distribution.
-///
-/// ## Setup
-///
-/// ```bash
-/// pip install refract-py pandas altair
-/// refract export "{{PAGE_TITLE}}" --format ndjson --flatten > events.csv
-/// ```
-///
-/// ## Load events
+# Work with notebooks
+
+Refract's event output is standard NDJSON — load it into any notebook environment for
+interactive analysis. This page shows a complete workflow in Python (Jupyter, Marimo)
+and R.
+
+## Setup
+
+```bash
+pip install pandas altair
+refract export "Bitcoin" --format ndjson > events.jsonl
+```
+
+## Load and explore
+
+### Python (Jupyter / Marimo)
 
 ```python
 import pandas as pd
 import json
 
 events = []
-with open("events.csv") as f:
+with open("events.jsonl") as f:
     for line in f:
-        if line.strip() and not line.startswith("#"):
+        if line.strip():
             events.append(json.loads(line))
 
 df = pd.json_normalize(events)
 df["timestamp"] = pd.to_datetime(df["timestamp"])
-len(df)
+
+print(f"Loaded {len(df)} events")
+print(f"Event types: {df['eventType'].nunique()}")
 ```
 
-/// ## Event type distribution
+### R
+
+```r
+library(jsonlite)
+library(dplyr)
+library(ggplot2)
+
+events <- stream_in(file("events.jsonl")) %>%
+  mutate(timestamp = as.POSIXct(timestamp))
+```
+
+## Event type distribution
+
+### Python
 
 ```python
 import altair as alt
 
 dist = df["eventType"].value_counts().reset_index()
 dist.columns = ["event_type", "count"]
+
 alt.Chart(dist).mark_bar().encode(
-    x="event_type", y="count", color="event_type"
-)
+    x=alt.X("event_type:N", sort="-y", title="Event type"),
+    y=alt.Y("count:Q", title="Count"),
+    color=alt.Color("event_type:N", legend=None)
+).properties(width=600, height=300)
 ```
 
-/// ## Citation churn over time
+### R
 
-/// Filter to citation events and count by month.
+```r
+events %>%
+  count(event_type) %>%
+  ggplot(aes(reorder(event_type, n), n)) +
+  geom_col() +
+  coord_flip() +
+  labs(x = "Event type", y = "Count")
+```
+
+## Citation churn over time
+
+### Python
 
 ```python
-citation_df = df[df["eventType"].str.contains("citation")]
-citation_df["month"] = citation_df["timestamp"].dt.to_period("M")
+citation_df = df[df["eventType"].str.startswith("citation")]
+citation_df["month"] = citation_df["timestamp"].dt.to_period("M").astype(str)
+
 churn = citation_df.groupby(["month", "eventType"]).size().reset_index(name="count")
-alt.Chart(churn).mark_line().encode(
-    x="month:T", y="count:Q", color="eventType:N"
-)
+
+alt.Chart(churn).mark_line(point=True).encode(
+    x=alt.X("month:T", title="Month"),
+    y=alt.Y("count:Q", title="Events"),
+    color=alt.Color("eventType:N", title="Citation event")
+).properties(width=600, height=300)
 ```
 
-/// ## Claim stability scores
+### R
 
-/// Events with high revert/edit-cluster counts indicate contested claims.
-/// This chart shows the relative frequency of contested vs stable events.
+```r
+events %>%
+  filter(grepl("^citation", event_type)) %>%
+  mutate(month = format(timestamp, "%Y-%m")) %>%
+  count(month, event_type) %>%
+  ggplot(aes(as.Date(paste0(month, "-01")), n, color = event_type)) +
+  geom_line() +
+  geom_point(size = 2) +
+  scale_x_date(date_breaks = "3 months", date_labels = "%b %Y") +
+  labs(x = "Month", y = "Events", color = "Citation event") +
+  theme_minimal()
+```
+
+## Claim stability scores
+
+### Python
+
+Define contested vs. stable events:
 
 ```python
-contested = ["revert_detected", "edit_cluster_detected", "sentence_removed"]
-df["is_contested"] = df["eventType"].isin(contested)
-stable_count = (~df["is_contested"]).sum()
-contested_count = df["is_contested"].sum()
+contested_types = ["revert_detected", "edit_cluster_detected", "sentence_removed"]
+df["stability"] = df["eventType"].apply(
+    lambda t: "Contested" if t in contested_types else "Stable"
+)
 
-pd.DataFrame({"category": ["Stable", "Contested"], "count": [stable_count, contested_count]})
+stability_counts = df["stability"].value_counts().reset_index()
+stability_counts.columns = ["category", "count"]
+stability_counts
 ```
+
+### R
+
+```r
+events %>%
+  mutate(stability = ifelse(
+    event_type %in% c("revert_detected", "edit_cluster_detected", "sentence_removed"),
+    "Contested", "Stable"
+  )) %>%
+  count(stability)
+```
+
+A high ratio of contested-to-stable events indicates an actively disputed page.
+A page with mostly stable events (citations added, sections reorganized, categories
+changed) is undergoing editorial improvement, not dispute.
+
+## Section-level analysis
+
+Which sections have the most activity?
+
+### Python
+
+```python
+section_activity = df["section"].value_counts().head(10)
+section_activity
+```
+
+### R
+
+```r
+events %>%
+  count(section, sort = TRUE) %>%
+  top_n(10)
+```
+
+Sections with high event counts combined with high revert ratios are the most
+contested parts of the page. Drill into a specific section by filtering on
+its name and re-running the stability analysis.
+
+## Exporting results
+
+### Python
+
+```python
+# Save stability analysis as CSV
+stability_counts.to_csv("bitcoin-stability.csv", index=False)
+
+# Save filtered events to new JSONL
+contested = df[df["stability"] == "Contested"]
+contested.to_json("contested-events.jsonl", orient="records", lines=True)
+```
+
+## Next steps
+
+- [Analyze with DuckDB](../analytics.md)
+- [Monitor citation churn on specific pages](citation-churn.md)
+- [Build a dispute timeline](dispute-timeline.md)
+
+## Using the Python SDK (`refract-py`)
+
+The [refract-py](https://github.com/refract-org/refract-py) package provides typed
+dataclasses and pandas integration for Python workflows:
+
+```bash
+pip install refract-py
+```
+
+### Load events with typed dataclasses
+
+```python
+from refract import RefractClient, EvidenceEvent
+
+client = RefractClient()
+events = client.analyze("Bitcoin", depth="detailed")
+# → list[EvidenceEvent] with typed fields: event_type, timestamp, section, etc.
+```
+
+### Load into pandas DataFrame
+
+```python
+import pandas as pd
+
+events_dict = [e.model_dump() for e in events]
+df = pd.DataFrame(events_dict)
+df["timestamp"] = pd.to_datetime(df["timestamp"])
+
+# Quick exploration
+df["event_type"].value_counts()
+df.groupby("section")["event_type"].count().sort_values(ascending=False)
+```
+
+### Analyze claim stability
+
+```python
+contested_types = ["revert_detected", "edit_cluster_detected", "sentence_removed"]
+df["stability"] = df["event_type"].apply(
+    lambda t: "Contested" if t in contested_types else "Stable"
+)
+
+print(df["stability"].value_counts())
+# → Stable: 285, Contested: 45
+```
+
+### Export to Parquet for archival
+
+```python
+df.to_parquet("bitcoin-events.parquet", index=False)
+```
+
+### LangChain document loader
+
+```python
+from refract_langchain import RefractDocumentLoader
+
+loader = RefractDocumentLoader(page="Bitcoin")
+docs = loader.load()
+# → list[Document] with page_content = claim text, metadata = stability + provenance
+```
+
+The Python SDK wraps the `@refract-org/cli` npm package — install both for full
+functionality: `pip install refract-py && npm install -g @refract-org/cli`. Typed
+exceptions like `RefractConfigError`, `RefractFetchError`, and
+`RefractInterpretationError` provide structured error handling.

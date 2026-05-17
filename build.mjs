@@ -15,8 +15,10 @@ const NAV = [
     title: 'Getting Started',
     slug: null,
     children: [
+      { title: 'Why Refract', slug: 'why-refract' },
       { title: 'Live Demo', slug: 'demo' },
       { title: 'Quick Start', slug: 'quickstart' },
+      { title: 'Complete Workflow', slug: 'complete-workflow' },
       { title: 'Install', slug: 'install' },
       { title: 'Concepts', slug: 'concepts' },
     ],
@@ -31,6 +33,8 @@ const NAV = [
       { title: 'Event Taxonomy', slug: 'events' },
       { title: 'Depth Levels', slug: 'depth' },
       { title: 'Bundles & Manifests', slug: 'bundle-manifest' },
+      { title: 'Evaluation', slug: 'eval' },
+      { title: 'Architecture Decisions', slug: 'architecture-decisions' },
     ],
   },
   {
@@ -41,6 +45,7 @@ const NAV = [
       { title: 'MCP / AI Agents', slug: 'mcp' },
       { title: 'Analytics with DuckDB', slug: 'analytics' },
       { title: 'Notebooks', slug: 'notebooks' },
+      { title: 'Cron Monitoring', slug: 'cron' },
     ],
   },
   {
@@ -51,6 +56,7 @@ const NAV = [
       { title: 'Fandom Canon', slug: 'tutorials/fandom-canon' },
       { title: 'Citation Churn', slug: 'tutorials/citation-churn' },
       { title: 'Dispute Timeline', slug: 'tutorials/dispute-timeline' },
+      { title: 'Cross-Wiki Diff', slug: 'tutorials/cross-wiki-diff' },
     ],
   },
   {
@@ -59,10 +65,12 @@ const NAV = [
     children: [
       { title: 'Glossary', slug: 'glossary' },
       { title: 'FAQ', slug: 'faq' },
+      { title: 'Interpreting Output', slug: 'interpretation' },
       { title: 'Security', slug: 'security' },
       { title: 'Boundary', slug: 'boundary' },
       { title: 'Naming', slug: 'naming' },
       { title: 'Frontier Use Cases', slug: 'frontier-use-cases' },
+      { title: 'Contributing to Docs', slug: 'contributing-docs' },
     ],
   },
 ];

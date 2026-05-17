@@ -63,25 +63,30 @@ refract analyze "Earth" --report > earth-report.json
 ## Contents
 
 ### Getting Started
-- [Install](install.md) — [Concepts](concepts.md)
+- [Why Refract](why-refract.md) — [Install](install.md)
+- [Concepts](concepts.md) — [Complete workflow](complete-workflow.md)
 
 ### Reference
 - [CLI command reference](cli.md) — [SDK / package reference](sdk.md)
 - [Event schema](schema.md) — [Event taxonomy](events.md)
 - [Analysis depth levels](depth.md) — [Export formats](bundle-manifest.md)
+- [Evaluation harness](eval.md) — [Architecture decisions](architecture-decisions.md)
 
 ### Integration
 - [Downstream integration](downstream.md) — [MCP: AI agent integration](mcp.md)
 - [Analytics with DuckDB](analytics.md) — [Notebook analysis](notebooks.md)
+- [Scheduled monitoring](cron.md)
 
 ### Tutorials
 - [Wikipedia history](tutorials/wikipedia-history.md) — [Fandom canon](tutorials/fandom-canon.md)
 - [Citation churn](tutorials/citation-churn.md) — [Dispute timeline](tutorials/dispute-timeline.md)
+- [Cross-wiki comparison](tutorials/cross-wiki-diff.md)
 
 ### Appendix
 - [Glossary](glossary.md) — [Troubleshooting / FAQ](faq.md)
-- [Security](security.md) — [Naming conventions](naming.md)
-- [Boundary](boundary.md) — [Frontier use cases](frontier-use-cases.md)
+- [Interpreting output](interpretation.md) — [Security](security.md)
+- [Naming conventions](naming.md) — [Boundary](boundary.md)
+- [Frontier use cases](frontier-use-cases.md) — [Contributing to docs](contributing-docs.md)
 
 ## License
 

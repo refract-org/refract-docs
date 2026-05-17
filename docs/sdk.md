@@ -4,6 +4,8 @@
 
 Refract's SDK is a set of packages that compose into a pipeline: ingest → analyze → persist.
 
+![Package dependency graph](packages.svg)
+
 Packages are published on npm under the `@refract-org` scope. All packages are ESM-only and written in TypeScript.
 
 ## Basic pipeline

@@ -32,7 +32,11 @@ Wikipedia API → Fetch → Analyze → Report → (optional) Validate
 | **Report** | Assembles structured events with revision, section, and timestamp provenance | Yes — deterministic ID via SHA-256 content hash |
 | **Validate** | Optional: compares pipeline output against ground truth labels (eval package) | Yes — deterministic comparison |
 
+![ObservationReport structure](observation-report.svg)
+
 ![Architecture data flow](architecture-flow.svg)
+
+![BYO-inference boundaries](byo-inference-bounds.svg)
 
 ## Depth levels
 
@@ -89,12 +93,12 @@ This is the architectural spine: Refract stays purely mechanical, but the bounda
 
 ## Two-knowledge split
 
-Refract separates mechanical observation from human judgment:
+Refract separates mechanical observation from ground truth verification:
 
-1. **Deterministic layer** — what changed, byte-for-byte reproducible. All analyzers, all events.
+1. **Deterministic layer** — what changed, byte-for-byte reproducible. All analyzers, all events. No model involved.
 2. **Ground truth layer** — independently verified outcome labels (talk page consensus, RFC closures, ArbCom decisions) stored in `@refract-org/eval`. Used for validation, never redefined by pipeline output.
 
-Downstream model interpretation is a separate concern — it consumes Refract's event stream without modifying it.
+Model-assisted interpretation happens downstream — in NextConsensus, in consumer applications, or anywhere else that builds on Refract's event stream. The diagram above shows this boundary: everything inside the dashed box is Refract. Everything labeled "Downstream" is external.
 
 ## What Refract does not do
 

@@ -2,6 +2,15 @@
 
 Try Refract in your browser. All data is pre-computed — no installation needed.
 
+<noscript>
+  <div style="padding: 2rem; background: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; margin: 1rem 0;">
+    <p style="font-weight: 600; color: #dc2626;">JavaScript required</p>
+    <p style="color: #4b5563;">This demo renders interactive charts from pre-computed Refract event data. Enable JavaScript to explore the Xanoleptin (synthetic drug), Luke Skywalker (Fandom), and Bitcoin (Wikipedia) datasets — each containing 30–50 structured events showing claim lifecycles, citation churn, and edit clusters.</p>
+    <p style="color: #4b5563;">For a text-based walkthrough without JavaScript, see the <a href="../tutorials/wikipedia-history/">Wikipedia History tutorial</a> or run Refract locally:</p>
+    <pre style="background: #f3f4f6; padding: 1rem; margin: 0.5rem 0;">npx @refract-org/cli analyze "Bitcoin" --depth detailed</pre>
+  </div>
+</noscript>
+
 <div id="demo-controls">
   <label>Dataset: <select id="dataset-select">
     <option value="xanoleptin">Xanoleptin (synthetic drug)</option>

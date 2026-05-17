@@ -192,4 +192,14 @@ When upgrading from `@refract-org/evidence-graph@0.3.x` to `0.4.x`:
 4. Every event now carries `schemaVersion` — verify your DDL can store this field
 5. `AnalyzerConfig` now supports `$version` for config pinning — optional, no migration action needed
 
+### Migration guide (0.4.x → 0.5.x)
+
+When upgrading from `@refract-org/cli@0.4.x` to `0.5.x`:
+
+1. The CLI binary is now `refract` (primary) and `wikihistory` (alias). Both work; `refract` is preferred.
+2. New commands: `refract explore` (web UI), `refract mcp` (MCP server), `refract visualize` (diagram export)
+3. `refract export --flatten` produces flat column-oriented CSV for analytical tools
+4. Optional dependencies: `apache-arrow` (Parquet export), `parquet-wasm` (WASM Parquet reader)
+5. No schema changes to `EvidenceEvent` — existing event consumers are forward-compatible
+
 See the [version compatibility table](schema#version-compatibility) for the full matrix.

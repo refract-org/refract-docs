@@ -15,10 +15,10 @@ refract analyze [page] [options]
 | `--from <revId>` | — | Start revision ID |
 | `--to <revId>` | — | End revision ID |
 | `--since <ts>` | — | Filter revisions after this ISO timestamp |
-| `-c, --cache` | off | Cache revisions in SQLite (`~/.refract/cache.db`) |
+| `-c, --cache` | off | Cache revisions in SQLite (`~/.wikihistory/refract.db`) |
 | `--pages-file <path>` | — | Batch file of page titles (one per line) |
 | `--api <url>` | `en.wikipedia.org` | MediaWiki API base URL |
-| `--cache-dir <path>` | `~/.refract` | Cache directory path |
+| `--cache-dir <path>` | `~/.wikihistory` | Cache directory path |
 | `-r, --report` | off | Output `ObservationReport` instead of raw events |
 | `--config <path>` | — | JSON file with analyzer config overrides |
 | `--similarity <n>` | `0.8` | Sentence matching threshold (0–1) |
@@ -153,6 +153,8 @@ refract export <page> [options]
 
 Start a local web explorer with timeline, evidence table, and diff viewer. (`wikihistory explore` also works.)
 
+![refract explore web UI](explore-ui.svg)
+
 ```bash
 refract explore <page> [options]
 ```
@@ -212,7 +214,7 @@ These options apply to most commands:
 | Flag | Description |
 |---|---|
 | `--api <url>` | MediaWiki API base URL (default: `en.wikipedia.org`) |
-| `--cache-dir <path>` | Cache directory path (default: `~/.refract`) |
+| `--cache-dir <path>` | Cache directory path (default: `~/.wikihistory`) |
 | `--api-key <token>` | API key for bearer token auth |
 | `--api-user <user>` | Username for basic auth |
 | `--api-password <pass>` | Password for basic auth |

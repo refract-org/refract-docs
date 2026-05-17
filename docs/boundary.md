@@ -2,6 +2,8 @@
 
 **Refract does not decide what is true. Refract makes visible how public knowledge changes.**
 
+![Refract boundary diagram](boundary.svg)
+
 ## What Refract is
 
 - A deterministic observation engine

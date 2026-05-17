@@ -5,7 +5,7 @@
 | Name | What it is | Why |
 |---|---|---|
 | **Refract** | The project | Sequence of observed changes |
-| **var-ia** | GitHub organization | `sequent` was taken as a GitHub org; `var-ia` was available |
+| **refract-org** | GitHub organization | npm scope matching; chosen for consistency with the project name |
 | **`@refract-org/*`** | npm package scope | All lowercase by npm convention |
 | **`refract`** / **`wikihistory`** | CLI commands | `refract` is the primary name; `wikihistory` works as an alias |
 
@@ -15,6 +15,6 @@ The CLI is named after the action it performs, not the project it belongs to. Wh
 
 ## In code
 
-- Use `Refract` (capital S) as the project name in prose
+- Use `Refract` (capital R) as the project name in prose
 - Use `@refract-org/<name>` when referencing packages
 - Use `refract` as the primary CLI command name; `wikihistory` is an alias

@@ -18,7 +18,7 @@
 
 **Ground truth** — Independently verified outcome labels (talk page consensus, RFC closures, ArbCom decisions) stored in the `@refract-org/eval` package. Used to validate pipeline output, never redefined by it.
 
-**L1 / L3** — Legacy terminology for the two layers: L1 (deterministic analysis) and L3 (ground truth validation). The preferred terms are "deterministic" and "ground truth."
+**L1 / L2** — The two layers of Refract's architecture: L1 (deterministic analysis — what changed, byte-for-byte reproducible) and L2 (independent ground truth — talk page consensus, RFC closures, ArbCom decisions). The preferred terms are "deterministic" and "ground truth."
 
 **MediaWiki** — The open-source wiki engine used by Wikipedia, Fandom, and thousands of other wikis. Refract works with any MediaWiki instance that exposes an `api.php` endpoint.
 

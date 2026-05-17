@@ -1,22 +1,31 @@
 # Analytics with DuckDB
 
-Refract's event output is newline-delimited JSON (NDJSON). [DuckDB](https://duckdb.org) can query it directly with SQL, no loading step needed.
+Refract's event output is newline-delimited JSON (NDJSON). [DuckDB](https://duckdb.org)
+can query it directly with SQL — no loading step, no schema definition, no extensions
+needed.
 
-## Quick start
+## Install DuckDB
+
+```bash
+brew install duckdb
+```
+
+Or download from [duckdb.org](https://duckdb.org/docs/installation/).
+
+## Export events and query
 
 ```bash
 # Export events
 refract export "Bitcoin" --format ndjson > bitcoin-events.jsonl
 
-# Query with DuckDB
-duckdb -c "SELECT event_type, count(*) as cnt
-           FROM 'bitcoin-events.jsonl'
-           GROUP BY event_type ORDER BY cnt DESC"
+# Quick count
+duckdb -c "SELECT count(*) FROM 'bitcoin-events.jsonl'"
 ```
 
-## Example queries
+DuckDB's JSON scanner detects column names and types automatically from the first
+batch of records. No CREATE TABLE or INSERT step.
 
-### Event type distribution
+## Event type distribution
 
 ```sql
 SELECT event_type, count(*) as cnt
@@ -25,34 +34,113 @@ GROUP BY event_type
 ORDER BY cnt DESC;
 ```
 
-### Citation churn over time
+Expected output for a typical Wikipedia page at `detailed` depth:
+
+| event_type | cnt |
+|------------|-----|
+| sentence_modified | 85 |
+| citation_added | 34 |
+| sentence_first_seen | 28 |
+| revert_detected | 15 |
+| template_added | 12 |
+| ... | ... |
+
+## Citation churn over time
 
 ```sql
 SELECT strftime(timestamp, '%Y-%m') as month,
-       count(*) as citation_events
+       count(*) FILTER (WHERE event_type = 'citation_added') as added,
+       count(*) FILTER (WHERE event_type = 'citation_removed') as removed,
+       count(*) FILTER (WHERE event_type = 'citation_replaced') as replaced
 FROM 'bitcoin-events.jsonl'
-WHERE event_type IN ('citation_added', 'citation_removed', 'citation_replaced')
+WHERE event_type LIKE 'citation_%'
 GROUP BY month
 ORDER BY month;
 ```
 
-### Template disputes
+Months with more removals than additions indicate net citation loss — the page
+is losing sources. Months with high replacement counts indicate active source
+updating, not necessarily instability.
+
+## Find the most contested sections
+
+Contested sections have both reverts and edit clusters:
 
 ```sql
-SELECT section, count(*) as template_events
+SELECT section,
+       count(*) FILTER (WHERE event_type = 'revert_detected') as reverts,
+       count(*) FILTER (WHERE event_type = 'edit_cluster_detected') as clusters,
+       count(*) FILTER (WHERE event_type LIKE 'sentence_%') as sentence_events,
+       count(*) as total_events
 FROM 'bitcoin-events.jsonl'
-WHERE event_type = 'template_added'
-  AND deterministic_facts[0]->>'fact' = 'template_changed'
 GROUP BY section
-ORDER BY template_events DESC;
+HAVING reverts > 0 OR clusters > 0
+ORDER BY (reverts + clusters) DESC;
 ```
 
-## DuckDB setup
+## Track a specific claim's lifecycle
+
+```sql
+SELECT event_type, timestamp, section,
+       before, after
+FROM 'bitcoin-events.jsonl'
+WHERE after LIKE '%decentralized%'
+   OR before LIKE '%decentralized%'
+ORDER BY timestamp;
+```
+
+## Section-level timeline
+
+```sql
+SELECT section, timestamp, event_type,
+       count(*) OVER (PARTITION BY section ORDER BY to_revision_id)
+         as cumulative_events
+FROM 'bitcoin-events.jsonl'
+ORDER BY section, timestamp;
+```
+
+## Talk page correlation
+
+Pages with active talk page discussions alongside content changes suggest editorial
+deliberation rather than edit-warring:
+
+```sql
+SELECT strftime(timestamp, '%Y-%m-%d') as day,
+       count(*) FILTER (WHERE event_type LIKE 'talk_%') as talk_events,
+       count(*) FILTER (WHERE event_type = 'revert_detected') as reverts
+FROM 'bitcoin-events.jsonl'
+GROUP BY day
+HAVING talk_events > 0 OR reverts > 0
+ORDER BY day;
+```
+
+## Multiple pages at once
 
 ```bash
-# Install DuckDB
-brew install duckdb
-# Or: curl -O https://github.com/duckdb/duckdb/releases/download/v1.5.2/duckdb_cli-osx-universal.zip
+# Create a pages file
+echo "Bitcoin" > pages.txt
+echo "Ethereum" >> pages.txt
+echo "Dogecoin" >> pages.txt
+
+# Batch analyze
+refract analyze --pages-file pages.txt --depth detailed -c
+
+# Export all
+refract export "Bitcoin" --format ndjson > events.jsonl
+refract export "Ethereum" --format ndjson >> events.jsonl
+refract export "Dogecoin" --format ndjson >> events.jsonl
+```
+
+Then compare across pages:
+
+```sql
+SELECT page_title,
+       count(*) as events,
+       count(*) FILTER (WHERE event_type = 'revert_detected') as reverts,
+       count(*) FILTER (WHERE event_type LIKE 'citation_%') as citation_churn
+FROM 'events.jsonl'
+GROUP BY page_title
+ORDER BY events DESC;
 ```
 
 ## Validation
@@ -60,6 +148,13 @@ brew install duckdb
 ```bash
 # Count events — should match refract analyze output
 duckdb -c "SELECT count(*) FROM 'events.jsonl'"
+
+# Verify event types are valid
+duckdb -c "SELECT DISTINCT event_type FROM 'events.jsonl' ORDER BY event_type"
+
+# Check for empty sections
+duckdb -c "SELECT count(*) FROM 'events.jsonl' WHERE section = ''"
 ```
 
-All queries work on native DuckDB with no extensions. Refract NDJSON follows the standard format that DuckDB's JSON scanner reads out of the box.
+All queries run on DuckDB 1.0+ with no extensions. Refract NDJSON follows the standard
+format that DuckDB's JSON scanner reads out of the box.

@@ -35,23 +35,6 @@ Then use the `refract` command directly (or `wikihistory` as an alias):
 refract analyze "Earth" --depth brief
 ```
 
-## Docker
-
-Prebuilt image (no build step):
-
-```bash
-docker run ghcr.io/var-ia/cli analyze "Earth" --depth brief
-```
-
-Or build from source:
-
-```bash
-git clone https://github.com/refract-org/refract.git
-cd refract
-docker build -t refract .
-docker run --rm refract analyze "Earth" --depth brief
-```
-
 ## From source
 
 ```bash

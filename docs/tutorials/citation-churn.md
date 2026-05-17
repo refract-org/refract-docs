@@ -1,36 +1,108 @@
-# Tutorial: Monitor citation churn on a medical/scientific page
+# Tutorial: Monitor citation churn on a contested page
 
 ## Goal
 
-Track citation additions and removals on a high-traffic medical Wikipedia page to detect sourcing changes over time.
+Track citation additions, removals, and replacements on a Wikipedia page to detect
+sourcing instability — which sources appear, which disappear, and which sections
+have the highest turnover.
+
+## Why citation churn matters
+
+Citation churn reveals source instability. When citations appear in one edit and
+disappear in the next, sources are contested. When a journal article is replaced
+with a news article, the evidence base is shifting. When churn concentrates on one
+section, a content dispute is likely underway.
+
+Refract detects all three patterns mechanically.
 
 ## Steps
 
-### 1. Analyze a medical page
+### 1. Analyze a page at forensic depth
 
 ```bash
-refract analyze "COVID-19" --depth detailed -c
+refract analyze "COVID-19" --depth forensic -c
 ```
 
-### 2. Export citation data as CSV
+Forensic depth enables all event types including citation replacement tracking.
+
+### 2. Filter to citation events
 
 ```bash
-refract export "COVID-19" --format csv
+refract export "COVID-19" --format ndjson | grep '"citation_' > citations.jsonl
 ```
 
-This produces a CSV with citation URLs, add/remove timestamps, and revision IDs — ready for spreadsheet analysis.
+This gives you a file with only `citation_added`, `citation_removed`, and
+`citation_replaced` events.
 
-### 3. Pipe to file
+### 3. Parse with a script
+
+```python
+import json
+
+additions = 0
+removals = 0
+replacements = 0
+sections = {}
+
+with open("citations.jsonl") as f:
+    for line in f:
+        event = json.loads(line)
+        etype = event["eventType"]
+        section = event["section"]
+        if etype == "citation_added":
+            additions += 1
+        elif etype == "citation_removed":
+            removals += 1
+        elif etype == "citation_replaced":
+            replacements += 1
+        sections[section] = sections.get(section, 0) + 1
+
+print(f"Additions: {additions}")
+print(f"Removals: {removals}")
+print(f"Replacements: {replacements}")
+print(f"\nChurn by section:")
+for sec, count in sorted(sections.items(), key=lambda x: -x[1])[:5]:
+    print(f"  {sec}: {count} events")
+```
+
+### 4. Query with DuckDB
 
 ```bash
-refract export "COVID-19" --format csv > churn-report.csv
+refract export "COVID-19" --format ndjson > covid-events.jsonl
 ```
 
-## Use case: identifying biased sourcing
+```sql
+SELECT section,
+       count(*) FILTER (WHERE event_type = 'citation_added') as added,
+       count(*) FILTER (WHERE event_type = 'citation_removed') as removed,
+       count(*) FILTER (WHERE event_type = 'citation_replaced') as replaced
+FROM 'covid-events.jsonl'
+WHERE event_type LIKE 'citation_%'
+GROUP BY section
+ORDER BY (added + removed + replaced) DESC
+LIMIT 5;
+```
 
-Citation churn patterns reveal source instability. A citation added in one edit and removed in the next signals contested sourcing. Citation replacement (journal swapped for a news article) indicates editors updating their evidence base. Churn concentrated on one page section may point to a content dispute.
+### 5. Track a specific source domain
 
-## Example output
+After export, filter by source domain to see which types of sources churn most
+(official sources vs. news media vs. academic journals vs. primary sources):
+
+```bash
+grep -o 'https\?://[^"]*' covid-events.jsonl | cut -d'/' -f3 | sort | uniq -c | sort -rn | head -10
+```
+
+## Reading the patterns
+
+| Pattern | What it means |
+|---------|---------------|
+| Citation added, never removed | Stable, uncontested source |
+| Citation added, removed in next edit | Contested — likely debated on talk page |
+| Citation replaced (journal → news) | Evidence base shifting in real time |
+| High churn in one section | Active editorial dispute in that section |
+| High churn across all sections | Page undergoing major revision or cleanup |
+
+## Example: vaccine efficacy section
 
 ```json
 {
@@ -40,7 +112,7 @@ Citation churn patterns reveal source instability. A citation added in one edit 
   "toRevisionId": 1280090100,
   "section": "Vaccine efficacy",
   "before": "",
-  "after": "<ref>{{cite journal |last1=Smith |title=...}}</ref>",
+  "after": "<ref>{{cite journal |last1=Smith |title=Efficacy of mRNA vaccines...}}</ref>",
   "timestamp": "2024-11-20T10:00:00Z",
   "layer": "observed",
   "deterministicFacts": [
@@ -48,31 +120,33 @@ Citation churn patterns reveal source instability. A citation added in one edit 
       "fact": "Citation added in section Vaccine efficacy",
       "provenance": {
         "analyzer": "citation-tracker",
-        "version": "0.3.1",
+        "version": "0.5.1",
         "inputHashes": []
       }
     }
   ]
 }
 ```
+
+Twenty-four hours later:
 
 ```json
 {
   "eventId": "2b4d6f8a0c1e3059",
-  "eventType": "citation_removed",
+  "eventType": "citation_replaced",
   "fromRevisionId": 1280090100,
   "toRevisionId": 1280090200,
   "section": "Vaccine efficacy",
-  "before": "<ref>{{cite journal |last1=Smith |title=...}}</ref>",
-  "after": "",
+  "before": "<ref>{{cite journal |last1=Smith...}}</ref>",
+  "after": "<ref>{{cite web |title=CDC Vaccine Report...}}</ref>",
   "timestamp": "2024-11-21T14:30:00Z",
   "layer": "observed",
   "deterministicFacts": [
     {
-      "fact": "Citation removed in section Vaccine efficacy",
+      "fact": "Citation replaced: journal article → web report",
       "provenance": {
         "analyzer": "citation-tracker",
-        "version": "0.3.1",
+        "version": "0.5.1",
         "inputHashes": []
       }
     }
@@ -80,8 +154,17 @@ Citation churn patterns reveal source instability. A citation added in one edit 
 }
 ```
 
-## Notes
+The journal article was swapped for a government web report — the evidence base
+shifted in under 24 hours. This pattern is what Refract is built to detect at scale.
 
-- Use `--format csv` or `--format ndjson` on `refract export` for spreadsheet-importable churn reports.
-- Group by source domain to see which types of sources churn most.
-- Refract tracks the citation change, not source quality — that's outside the boundary.
+## Troubleshooting
+
+- **No citation events?** The page may use minimal citations. Try a page with
+  active sourcing (medical, scientific, or controversial topics work best).
+- **DuckDB version**: DuckDB 1.0+ required for the `FILTER` clause. For older
+  versions, use `SUM(CASE WHEN ... THEN 1 ELSE 0 END)`.
+
+## Next steps
+
+- [Build a dispute timeline](dispute-timeline.md)
+- [Analyze with DuckDB](../analytics.md)

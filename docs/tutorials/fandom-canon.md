@@ -2,35 +2,43 @@
 
 ## Goal
 
-Monitor how a Fandom wiki's canon pages change over time, tracking additions and removals of lore-critical statements.
+Monitor how a Fandom wiki's canon pages change over time: when lore-critical
+statements appear, disappear, or are rewritten — and how editorial consensus shifts.
 
 ## Steps
 
-### 1. Configure a Fandom wiki
+### 1. Point Refract at a Fandom wiki
 
-Fandom wikis use the same MediaWiki API. Point `--api` at the wiki's API endpoint:
+Fandom wikis use the standard MediaWiki API. Pass `--api` with the wiki's API endpoint:
 
 ```bash
 refract analyze "Darth_Vader" --api https://starwars.fandom.com/api.php --depth detailed
 ```
 
-### 2. Run analyzers with caching
+### 2. Cache for repeated analysis
+
+Fandom API rate limits differ from Wikipedia. Cache revisions to avoid re-fetching:
 
 ```bash
 refract analyze "Darth_Vader" --api https://starwars.fandom.com/api.php --depth detailed -c
 ```
 
-### 3. Export results
+### 3. Export for comparison
 
 ```bash
-refract export "Darth_Vader" --api https://starwars.fandom.com/api.php --format json
+refract export "Darth_Vader" --api https://starwars.fandom.com/api.php --format ndjson > canon-events.jsonl
 ```
 
-### 4. Track a specific claim
+### 4. Track a specific lore claim
 
 ```bash
-refract claim "Darth_Vader" --text "midichlorian count is over 20,000" --api https://starwars.fandom.com/api.php -c
+refract claim "Darth_Vader" \
+  --text "midichlorian count is over 20,000" \
+  --api https://starwars.fandom.com/api.php -c
 ```
+
+This produces a timeline of every revision where that claim was added, modified,
+removed, or reintroduced.
 
 ### 5. Watch for new edits
 
@@ -38,38 +46,75 @@ refract claim "Darth_Vader" --text "midichlorian count is over 20,000" --api htt
 refract watch "Darth_Vader" --api https://starwars.fandom.com/api.php --interval 60000
 ```
 
-## Use case: preserving canonicity
+Polls the wiki every 60 seconds and prints new events as they appear. Press Ctrl+C to stop.
 
-Fandom canon pages drift as new media releases or retcons earlier material. Character backstories, power levels, timelines, and faction alignments are frequently updated. Refract tracks these changes as `sentence_first_seen` and `sentence_removed` events, letting you see exactly which lore-critical statement changed and when. Compare claim stability across pages to see which characters or settings have the most contested canon.
+## Understanding what you see
 
-## Example output
+Fandom wikis differ from Wikipedia in important ways:
 
-```json
-{
-  "eventId": "f7a2d0e3c1b84906",
-  "eventType": "sentence_first_seen",
-  "fromRevisionId": 1280012345,
-  "toRevisionId": 1280016789,
-  "section": "Powers and abilities",
-  "before": "",
-  "after": "Darth Vader's midichlorian count is over 20,000",
-  "timestamp": "2024-12-01T08:15:00Z",
-  "layer": "observed",
-  "deterministicFacts": [
-    {
-      "fact": "New sentence first appeared: Darth Vader's midichlorian count is over 20,000",
-      "provenance": {
-        "analyzer": "section-differ",
-        "version": "0.3.1",
-        "inputHashes": []
-      }
-    }
-  ]
-}
+| Signal | On Wikipedia | On Fandom wikis |
+|--------|-------------|-----------------|
+| **`sentence_first_seen`** | New factual claim | New character backstory, power level, or timeline entry |
+| **`sentence_removed`** | Claim removed (possibly contested) | Retcon — lore being erased or rewritten |
+| **`category_added` / `category_removed`** | Content tagging change | Canon classification shift (e.g., "Canon characters" → "Legends characters") |
+| **`template_added`** | Policy template | "Citation needed" on lore claims, "Speculation" tags |
+| **`revert_detected`** | Editorial dispute | Canon war — competing interpretations of what's official |
+
+**Retcon detection pattern**: Watch for `sentence_removed` on a long-standing claim
+followed by `sentence_first_seen` with different text in the same section. This is
+the mechanical signature of a retcon — old lore replaced by new canon.
+
+**Canon divergence across wikis**: Compare the same topic across two Fandom wikis with
+`refract diff`. Divergence in categories or template usage between wikis signals
+different interpretations of what's official.
+
+## Example: 2014 Disney acquisition
+
+After Disney acquired Lucasfilm in 2014, many characters and ships had their
+canon status reclassified. Refract captures this as a pattern of:
+
+- `category_removed`: `Canon characters`
+- `category_added`: `Legends characters`
+- `sentence_modified` events as backstories were rewritten to match new canon
+- `template_added`: `{{Legends|canon}}` banners
+
+```
+[2014-04-25] category_removed (rev 123456→123457)
+  Section: body
+  target: Category:Canon characters
+
+[2014-04-25] category_added (rev 123456→123457)
+  Section: body
+  target: Category:Legends characters
 ```
 
-## Notes
+## Cross-wiki comparison
 
-- Fandom wikis use the standard MediaWiki API — pass the API URL with `--api`.
-- Fandom wiki APIs may have different rate limits; use `-c` to cache revisions.
-- For multi-page monitoring, use a pages file with `refract cron`.
+For the same fictional universe across competing wikis, use `refract diff`:
+
+```bash
+refract diff "Darth_Vader" \
+  --wiki-a https://starwars.fandom.com/api.php \
+  --wiki-b https://star-wars.fandom.com/api.php \
+  --depth detailed
+```
+
+This produces a side-by-side analysis showing where the two wikis diverge on the same
+topic — different backstories, different categorizations, different levels of detail.
+
+## Troubleshooting
+
+- **Fandom rate limits**: Fandom APIs may throttle more aggressively than Wikipedia.
+  Use `-c` to cache and add `--interval 120000` for `watch` mode if you hit limits.
+- **Private wikis**: Pass auth credentials for private or institutional MediaWiki
+  instances: `--api-key <token>` or `--api-user <user> --api-password <pass>`.
+- **Custom domain wikis**: Fandom wikis hosted on custom domains still expose the
+  MediaWiki API at `https://<domain>/api.php`. Find the API endpoint by appending
+  `?action=query&format=json` to the wiki's base URL.
+
+## Next steps
+
+- [Track Wikipedia changes](wikipedia-history.md)
+- [Monitor citation churn](citation-churn.md)
+- [Build a dispute timeline](dispute-timeline.md)
+- [Analyze with DuckDB](../analytics.md)

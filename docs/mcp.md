@@ -4,6 +4,8 @@
 
 The MCP server supports **sampling** — it can request the host's LLM to interpret events at any BYO-inference boundary without managing API keys.
 
+![MCP protocol sequence](mcp-sequence.svg)
+
 ## Quick start
 
 ```bash
