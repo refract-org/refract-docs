@@ -95,9 +95,9 @@ Refract's event stream is purely mechanical. All interpretation happens downstre
 | **Provenance-aware RAG** | Enrich each retrieved chunk with its claim history — stable, recently changed, source-fragile, contested. Use the signal to weight or filter results. |
 | **Regulatory monitoring** | Run `refract cron` on drug pages, guidelines, and regulatory topics. Alert on citation removal, template disputes, or section reorganization. |
 | **Competitive intelligence** | Use `refract diff` to compare how the same topic is framed across wikis (English vs German Wikipedia, Fandom vs independent wiki). Track divergence over time. |
-| **Fact-checking** | Given a claim, query its lifecycle — first appearance, source additions, revert history, talk page activity. Return a verifiable provenance timeline. |
-| **Academic research** | Export `ObservationReport` with Merkle-verifiable claim histories. Analyze claim stability across topics, time periods, and editorial environments. |
-| **Journalism forensics** | Track how a specific claim about a person evolved. Detect coordinated editing, source softening, or removal without replacement. |
+| **Fact-checking** | Given a claim, query its lifecycle — first appearance, source additions, revert history, talk page activity. Detect citation laundering (same claim, different source). Return a verifiable provenance timeline. See [tutorial](tutorials/combating-revisionism.md). |
+| **Academic research** | Export `ObservationReport` with Merkle-verifiable claim histories. Combat revisionism by producing cryptographic audit trails — deterministic event streams that anyone can reproduce independently. Analyze claim stability across topics, time periods, and editorial environments. |
+| **Journalism forensics** | Track how a specific claim about a person evolved. Detect coordinated editing (edit clusters), source softening (citation laundering), or removal without replacement. See [tutorial](tutorials/combating-revisionism.md). |
 | **Fan wiki canon tracking** | Compare the same fictional universe across competing wikis. Detect retcon divergence and measure by how much. |
 | **Knowledge graph engineering** | Use `--depth forensic` to capture category and wikilink change events. Build an entity graph that evolves with the public record. |
 

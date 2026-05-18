@@ -28,8 +28,7 @@ docs/
 - **Boundary statement**: "Refract does not decide what is true. Refract makes visible how public knowledge changes."
 - **Open source framing**: "What changed?" for what Refract does. "Not included: Domain-specific decision judgment." for what Refract excludes.
 - **Tone**: technical, neutral, precise. No marketing language.
-- **Tutorials**: markdown with TODO notes for incomplete sections.
-- **CLI examples**: always use `wikihistory` as the command name.
+- **CLI examples**: always use `refract` as the command name (`wikihistory` works as a backward-compat alias).
 
 ## Copy conventions
 

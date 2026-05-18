@@ -53,12 +53,13 @@ refract analyze "Earth" --report > earth-report.json
 
 | You are | Start here |
 |---------|-----------|
-| **Journalist or researcher** | [Live Demo](demo.md) → [Quick Start](quickstart.md) → [Tutorials](tutorials/wikipedia-history.md) |
-| **Data scientist or OSINT analyst** | [Analytics with DuckDB](analytics.md) → [Notebook analysis](notebooks.md) → [Export with --flatten](quickstart.md) |
-| **ML engineer building RAG** | [Downstream integration](downstream.md) → [Python SDK](https://github.com/refract-org/refract-py) → [LangChain loader](https://github.com/refract-org/refract-py/blob/main/src/refract_langchain.py) |
-| **Regulatory or policy monitor** | [CLI cron](cli.md) → [GitHub Actions observe workflow](https://github.com/refract-org/refract) → [Tutorial: Citation churn](tutorials/citation-churn.md) |
-| **AI agent developer** | [MCP / AI integration](mcp.md) → [BYO-inference boundaries](concepts.md) → [Classify command](cli.md) |
-| **System integrator** | [SDK reference](sdk.md) → [Production DDL](downstream.md) → [Version compatibility](schema.md) |
+| **Journalist or researcher** | [Live Demo](demo.md) → [Quick Start](quickstart.md) → [Wikipedia history](tutorials/wikipedia-history.md) |
+| **Data scientist or OSINT analyst** | [Python SDK](tutorials/python-sdk.md) → [Analytics with DuckDB](analytics.md) → [Notebook analysis](notebooks.md) |
+| **ML engineer building RAG** | [RAG provenance](tutorials/rag-provenance.md) → [Python SDK](tutorials/python-sdk.md) → [BYO-inference](tutorials/byo-inference.md) |
+| **Regulatory or policy monitor** | [Scheduled monitoring](tutorials/scheduled-monitoring.md) → [CLI cron](cli.md) → [Citation churn](tutorials/citation-churn.md) |
+| **AI agent developer** | [MCP agent tutorial](tutorials/mcp-agent.md) → [MCP reference](mcp.md) → [BYO-inference](tutorials/byo-inference.md) |
+| **System integrator** | [SDK reference](sdk.md) → [Production DDL](downstream.md) → [Private wikis](tutorials/private-wiki.md) |
+| **Developer / contributor** | [Build a custom analyzer](tutorials/custom-analyzer.md) → [Custom eval labels](tutorials/custom-eval.md) → [Architecture decisions](architecture-decisions.md) |
 
 ## Contents
 
@@ -80,7 +81,10 @@ refract analyze "Earth" --report > earth-report.json
 ### Tutorials
 - [Wikipedia history](tutorials/wikipedia-history.md) — [Fandom canon](tutorials/fandom-canon.md)
 - [Citation churn](tutorials/citation-churn.md) — [Dispute timeline](tutorials/dispute-timeline.md)
-- [Cross-wiki comparison](tutorials/cross-wiki-diff.md)
+- [RAG provenance](tutorials/rag-provenance.md) — [MCP agent](tutorials/mcp-agent.md)
+- [Scheduled monitoring](tutorials/scheduled-monitoring.md) — [Python SDK](tutorials/python-sdk.md)
+- [BYO-inference](tutorials/byo-inference.md) — [Custom analyzer](tutorials/custom-analyzer.md)
+- [Custom eval labels](tutorials/custom-eval.md) — [Private wikis](tutorials/private-wiki.md)
 
 ### Appendix
 - [Glossary](glossary.md) — [Troubleshooting / FAQ](faq.md)

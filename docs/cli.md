@@ -1,8 +1,10 @@
 # CLI command reference
 
+All commands work with `wikihistory` as a backward-compatible alias (e.g., `wikihistory analyze`).
+
 ## `refract analyze`
 
-Analyze full edit history of a page. (`wikihistory analyze` also works.)
+Analyze full edit history of a page.
 
 ```bash
 refract analyze [page] [options]
@@ -30,7 +32,7 @@ refract analyze [page] [options]
 
 ## `refract claim`
 
-Track a specific claim across revisions. (`wikihistory claim` also works.)
+Track a specific claim across revisions.
 
 ```bash
 refract claim <page> [options]
@@ -45,7 +47,7 @@ refract claim <page> [options]
 
 ## `refract cron`
 
-One-shot re-observation for cron scheduling. (`wikihistory cron` also works.)
+One-shot re-observation for cron scheduling.
 
 ```bash
 refract cron <pages-file> [options]
@@ -62,7 +64,7 @@ refract cron <pages-file> [options]
 
 ## `refract diff`
 
-Cross-wiki comparison (2+ wikis). (`wikihistory diff` also works.)
+Cross-wiki comparison (2+ wikis).
 
 ```bash
 refract diff <topic> [options]
@@ -78,7 +80,7 @@ refract diff <topic> [options]
 
 ## `refract eval`
 
-Run the evaluation harness. (`wikihistory eval` also works.)
+Run the evaluation harness.
 
 ```bash
 refract eval [options]
@@ -91,7 +93,7 @@ refract eval [options]
 
 ## `refract classify`
 
-Classify a single observation boundary using an inference provider. (`wikihistory classify` also works.)
+Classify a single observation boundary using an inference provider.
 
 ```bash
 refract classify <boundary> --input '<json>'
@@ -133,7 +135,7 @@ The output includes `source: "model"` or `"default"` for auditability.
 
 ## `refract export`
 
-Export analysis as structured data. (`wikihistory export` also works.)
+Export analysis as structured data.
 
 ```bash
 refract export <page> [options]
@@ -151,7 +153,7 @@ refract export <page> [options]
 
 ## `refract explore`
 
-Start a local web explorer with timeline, evidence table, and diff viewer. (`wikihistory explore` also works.)
+Start a local web explorer with timeline, evidence table, and diff viewer.
 
 ![refract explore web UI](explore-ui.svg)
 
@@ -171,7 +173,7 @@ refract explore <page> [options]
 
 ## `refract visualize`
 
-Export evidence graph as a diagram. (`wikihistory visualize` also works.)
+Export evidence graph as a diagram.
 
 ```bash
 refract visualize <page> [options]
@@ -186,7 +188,7 @@ refract visualize <page> [options]
 
 ## `refract watch`
 
-Live polling daemon for new edits. (`wikihistory watch` also works.)
+Live polling daemon for new edits.
 
 ```bash
 refract watch <page> [options]
@@ -201,7 +203,7 @@ refract watch <page> [options]
 
 ## `refract mcp`
 
-Start MCP server for AI agent integration. (`wikihistory mcp` also works.)
+Start MCP server for AI agent integration.
 
 ```bash
 refract mcp
