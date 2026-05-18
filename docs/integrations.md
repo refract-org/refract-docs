@@ -34,6 +34,16 @@ Refract produces a deterministic event stream — standard NDJSON with typed sch
 | **OpenAI / DeepSeek / Ollama** | Plug any OpenAI-compatible endpoint into `refract classify` at BYO-inference boundaries. | [BYO-inference tutorial](tutorials/byo-inference.md) |
 | **MCP clients** | Claude Code, VS Code, Cursor, Claude Desktop connect via `refract mcp`. Agents call Refract tools directly. | [MCP agent tutorial](tutorials/mcp-agent.md) |
 
+### Model evaluation
+
+| Tool | How | Docs |
+|---|---|---|
+| **Temporal leakage detection** | `refract_eval.build_leakage_benchmark()` — find claims that appeared after a model's cutoff | [Model evaluation tutorial](tutorials/model-evaluation.md) |
+| **Retrieval quality scoring** | `refract_eval.score_retrieval_quality()` — score passages by stability | [RAG tutorial](tutorials/rag-provenance.md) |
+| **Provenance hallucination** | `refract_eval.check_provenance()` — verify if a source ever existed | [Model evaluation tutorial](tutorials/model-evaluation.md) |
+| **Benchmark submission** | Standard 10-page benchmark, submission format, reproducibility requirements | [BENCHMARK.md](https://github.com/refract-org/refract/blob/main/BENCHMARK.md) |
+| **Colab notebook** | Ready-to-run notebook — `pip install refract-py` and go | [notebooks/model-evaluation.ipynb](notebooks/model-evaluation.ipynb) |
+
 ### Notebooks and visualization
 
 | Tool | How | Docs |

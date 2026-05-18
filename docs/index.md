@@ -1,6 +1,6 @@
-# Refract: the open claim-history layer for public knowledge
+# Refract: deterministic ground truth for model evaluation
 
-**Refract reveals how claims change across public revision histories.**
+**Refract reveals how claims change across public revision histories — and gives AI researchers reproducible evidence for model evaluation.**
 
 ```bash
 npx @refract-org/cli analyze "Earth" --depth brief
