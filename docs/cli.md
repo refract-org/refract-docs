@@ -2,6 +2,18 @@
 
 All commands work with `wikihistory` as a backward-compatible alias (e.g., `wikihistory analyze`).
 
+## `refract init`
+
+Onboarding — runs a quick analysis and shows what Refract can do.
+
+```bash
+refract init
+```
+
+Fetches recent revisions of "Earth," runs the section differ, and prints next steps:
+analyze, explore, claim, snapshot, monitor, mcp. No flags needed — a zero-config
+first experience.
+
 ## `refract analyze`
 
 Analyze full edit history of a page.
@@ -44,6 +56,24 @@ refract claim <page> [options]
 | `-t, --text <text>` | required | Claim text to track |
 | `-c, --cache` | off | Cache revisions in SQLite |
 | `--api <url>` | `en.wikipedia.org` | MediaWiki API base URL |
+
+## `refract snapshot`
+
+Reconstruct page state at a point in time.
+
+```bash
+refract snapshot <page> [options]
+```
+
+| Flag | Default | Description |
+|---|---|---|
+| `page` | required (positional) | Page title |
+| `--at <date>` | today | Target date (ISO 8601, e.g. `2024-01-15`). Finds the closest revision at or before this date. |
+| `-c, --cache` | off | Cache revisions in SQLite |
+| `--api <url>` | `en.wikipedia.org` | MediaWiki API base URL |
+
+Displays section list, plain text content, and metadata (revision ID, editor, size,
+edit comment). Content is truncated at 2000 characters.
 
 ## `refract cron`
 
@@ -144,7 +174,7 @@ refract export <page> [options]
 | Flag | Default | Description |
 |---|---|---|---|
 | `page` | required (positional) | Page title |
-| `-f, --format <fmt>` | `json` | Output format: `json`, `csv`, `ndjson`, `html` |
+| `-f, --format <fmt>` | `json` | Output format: `json`, `csv`, `ndjson`, `html`, `parquet` |
 | `--bundle` | off | Export as signed evidence bundle (SHA-256). See [bundle format](bundle-manifest.md). |
 | `--manifest` | off | Export as replay manifest with all hashes. See [manifest format](bundle-manifest.md). |
 | `-r, --report` | off | Output `ObservationReport` instead of raw events |
@@ -208,6 +238,37 @@ Start MCP server for AI agent integration.
 ```bash
 refract mcp
 ```
+
+## `refract stream`
+
+Live stream of Wikipedia edits via EventStreams. Connects to Wikimedia's real-time
+edit feed and prints events as they happen.
+
+```bash
+refract stream [page] [options]
+```
+
+| Flag | Default | Description |
+|---|---|---|
+| `page` | optional | Page title to watch. Omit to stream all edits. |
+| `--wiki <wiki>` | `enwiki` | Wiki to stream (e.g., `enwiki`, `dewiki`, `frwiki`) |
+
+Filters out bot edits and non-main-namespace changes automatically. Press Ctrl+C
+to stop.
+
+```bash
+# Watch all edits on English Wikipedia
+refract stream
+
+# Watch a specific page
+refract stream "COVID-19"
+
+# Watch German Wikipedia
+refract stream "COVID-19" --wiki dewiki
+```
+
+The stream provides revision metadata (ID, user, comment, timestamp) but not full
+revision content. Use `refract analyze` for full content analysis.
 
 ## Global options
 

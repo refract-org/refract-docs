@@ -43,4 +43,5 @@ docs/
 
 ```bash
 node build.mjs      # builds static HTML from docs/ → dist/
+npm test            # runs build (verifies docs compile without errors)
 ```

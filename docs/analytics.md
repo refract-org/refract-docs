@@ -4,6 +4,16 @@ Refract's event output is newline-delimited JSON (NDJSON). [DuckDB](https://duck
 can query it directly with SQL — no loading step, no schema definition, no extensions
 needed.
 
+**Quick start**: Refract ships a [`refract-analytics.sql`](https://github.com/refract-org/refract/blob/main/refract-analytics.sql) file with pre-built views.
+Load it and query immediately:
+
+```bash
+duckdb -c ".read refract-analytics.sql" -c "SELECT * FROM contested_claims;"
+```
+
+Views included: `contested_claims`, `citation_churn_by_month`, `section_activity`,
+`event_type_distribution`, `talk_content_ratio`.
+
 ## Install DuckDB
 
 ```bash
