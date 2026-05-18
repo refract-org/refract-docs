@@ -50,6 +50,21 @@ get from Wikipedia's built-in tools vs. what Refract adds.
 - You're building a **RAG pipeline** that needs claim stability signals
 - You want **AI agents** to reason about page history with structured data
 
+## Refract vs. AI evaluation tools
+
+Refract's model evaluation capability — temporal leakage detection, provenance hallucination checking, retrieval quality scoring — has no direct competitor. Existing tools evaluate models on accuracy, safety, or reasoning. None evaluate models against deterministic ground truth about what was public knowledge and when.
+
+| Capability | Existing tools | Refract |
+|---|---|---|
+| **Temporal leakage detection** | Heuristic: compare model output to training cutoff dates. No deterministic proof. | `refract_eval.build_leakage_benchmark()` — exact revision ID, timestamp, SHA-256 hash. Proves leakage deterministically. |
+| **Provenance hallucination** | Manual: check model citations against sources one at a time. | `refract_eval.check_provenance()` — query citation_added/removed/replaced events. Classify: verified, outdated, hallucinated. |
+| **Retrieval quality (stability-weighted)** | Embedding similarity only. Contested and stable passages score identically. | `refract_eval.score_retrieval_quality()` — each passage scored by revert count, citation churn, talk activity. |
+| **Knowledge recency** | No standard tooling. Ad-hoc: "ask the model what date it thinks it is." | `refract snapshot "Page" --at <date>` — deterministic page state at any point. Compare model answer against ground truth. |
+| **Standard benchmark** | No open benchmark for temporal ground truth. | `BENCHMARK.md` — 10 standard pages, submission format, reproducibility requirements. |
+| **Reproducibility** | Most eval suites: "run our script, trust our numbers." | Every event has a deterministic SHA-256 hash. Reviewer runs same command, gets same hash. |
+
+**The gap Refract fills**: every eval suite tests whether a model is *accurate*. None test whether a model *knows things it shouldn't*. Refract provides the ground truth for that test — and makes it reproducible.
+
 ## When Wikipedia's UI is enough
 
 - You're checking **one revision diff** quickly
