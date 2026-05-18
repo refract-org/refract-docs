@@ -142,8 +142,30 @@ except RefractError as e:
     # or the CLI may not be installed
 ```
 
-`RefractError` carries the CLI's stderr output — check the message to distinguish
-between "page not found", "API timeout", and "CLI not installed".
+## Step 8: Use the model evaluation adapter
+
+`refract_eval` maps Refract events to model evaluation records — no CLI needed:
+
+```python
+from refract_eval import build_leakage_benchmark, check_provenance
+
+# Export events first, then use the adapter
+r.export("COVID-19", format="ndjson", flatten=False)
+# (events saved to stdout — pipe to file, then load with adapter)
+
+# Or use pre-computed events:
+records = build_leakage_benchmark("covid-events.jsonl", cutoff="2024-06-01")
+leaked = [r for r in records if r.leaked]
+print(f"Leakage rate: {len(leaked)}/{len(records)}")
+
+# Check if a source ever existed on the page
+result = check_provenance("covid-events.jsonl", "who.int")
+print(f"Verified: {result.verified}, Outdated: {result.outdated}")
+```
+
+See the [model evaluation tutorial](model-evaluation.md) for full benchmark workflows and
+the [benchmark specification](https://github.com/refract-org/refract/blob/main/BENCHMARK.md)
+for standard pages and submission format.
 
 ## Next steps
 

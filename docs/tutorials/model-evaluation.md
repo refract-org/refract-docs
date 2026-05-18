@@ -6,6 +6,10 @@ Use Refract as deterministic ground truth to evaluate frontier models. Test temp
 leakage, compare retrieval quality, detect provenance hallucination, and measure
 knowledge recency — all with reproducible evidence, not heuristic scores.
 
+**Python users**: skip the CLI examples below and use `refract_eval` directly —
+`build_leakage_benchmark()`, `check_provenance()`, `score_retrieval_quality()`.
+[→ Python SDK tutorial](python-sdk.md)
+
 Refract doesn't evaluate models. It provides the ground truth that makes evaluation
 possible. Every claim is backed by a revision ID, timestamp, and deterministic
 SHA-256 hash. Anyone can reproduce your results.
@@ -207,6 +211,32 @@ model trained in June that answers with January information is stale.
 4. Score accuracy against the deterministic snapshot at that date
 5. Publish: "Model X's effective knowledge is ~2 months behind its claimed cutoff.
    Model Y's knowledge is accurate to within 1 week of its cutoff."
+
+## Using the Python eval adapter
+
+All of the above workflows have a Python equivalent. Install `refract-py` and use
+`refract_eval` directly — no CLI needed:
+
+```python
+from refract_eval import build_leakage_benchmark, check_provenance, score_retrieval_quality
+
+# Temporal leakage
+records = build_leakage_benchmark("events.jsonl", cutoff="2024-06-01")
+leaked = [r for r in records if r.leaked]
+print(f"Leakage rate: {len(leaked)}/{len(records)}")
+
+# Provenance check
+result = check_provenance("events.jsonl", "who.int")
+print(f"Verified: {result.verified}, Outdated: {result.outdated}, Hallucinated: {result.hallucinated}")
+
+# Retrieval quality
+scores = score_retrieval_quality("events.jsonl", ["passage 1", "passage 2"])
+for s in scores:
+    print(f"{s['passage'][:50]}... → stability: {s['score']}")
+```
+
+The adapter source is in `refract-py/src/refract_eval.py`. See the [Python SDK
+tutorial](python-sdk.md) for the full notebook workflow.
 
 ## Reproducibility
 
