@@ -1,8 +1,8 @@
 # Refract Docs
 
-Public documentation for [Refract](https://github.com/refract-org/refract) — the open claim-history layer for public knowledge.
+Public documentation for [Refract](https://github.com/refract-org/refract) — open infrastructure for knowledge-change provenance.
 
-**Refract reveals how claims change across public revision histories.**
+**Refract is open infrastructure for agent-readable knowledge change. It turns source histories into replayable semantic change events about claims, citations, and evidence bindings.**
 
 ---
 
