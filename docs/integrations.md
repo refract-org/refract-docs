@@ -90,6 +90,7 @@ Use a single adapter file as the import boundary between Refract and your codeba
 // adapter.ts — single import boundary
 export type { EvidenceEvent, FactProvenance } from '@refract-org/evidence-graph';
 export { sectionDiffer, citationTracker } from '@refract-org/analyzers';
+export { computeCertaintyProfile, computeDirectionSignal, extractQuantitativeFindings } from '@refract-org/analyzers';
 ```
 
 No other file imports from `@refract-org/*` directly. This isolates version upgrades to one file.

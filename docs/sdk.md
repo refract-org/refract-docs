@@ -12,7 +12,13 @@ Packages are published on npm under the `@refract-org` scope. All packages are E
 
 ```typescript
 import { MediaWikiClient } from "@refract-org/ingestion";
-import { sectionDiffer, citationTracker } from "@refract-org/analyzers";
+import {
+  sectionDiffer,
+  citationTracker,
+  computeCertaintyProfile,
+  computeDirectionSignal,
+  extractQuantitativeFindings,
+} from "@refract-org/analyzers";
 import type { EvidenceEvent } from "@refract-org/evidence-graph";
 
 const client = new MediaWikiClient({ apiUrl: "https://en.wikipedia.org/w/api.php" });
@@ -20,14 +26,24 @@ const revisions = await client.fetchRevisions("Earth");
 
 const events: EvidenceEvent[] = [];
 for (let i = 1; i < revisions.length; i++) {
+  const before = revisions[i - 1].content;
+  const after = revisions[i].content;
+
+  // Deterministic structural diffs
   events.push(...sectionDiffer.diffSections(
-    sectionDiffer.extractSections(revisions[i - 1].content),
-    sectionDiffer.extractSections(revisions[i].content),
+    sectionDiffer.extractSections(before),
+    sectionDiffer.extractSections(after),
   ));
   events.push(...citationTracker.diffCitations(
-    citationTracker.extractCitations(revisions[i - 1].content),
-    citationTracker.extractCitations(revisions[i].content),
+    citationTracker.extractCitations(before),
+    citationTracker.extractCitations(after),
   ));
+
+  // Deterministic semantic enrichment (v0.5.0+)
+  const beforeProfile = computeCertaintyProfile(before);
+  const afterProfile = computeCertaintyProfile(after);
+  const direction = computeDirectionSignal(beforeProfile, afterProfile);
+  const findings = extractQuantitativeFindings(after);
 }
 ```
 
@@ -124,6 +140,7 @@ Key exports:
 - Parsers: `sanitizeWikitext`, `extractHeadingMap`, `extractWikilinks`, `extractCategories`, `countCitations`, `countKeywordMentions`, `deriveSectionHeading`
 - Cross-revision: `correlateTalkRevisions`, `diffObservations`, `parseTalkThreads`, `diffTalkThreads`, `diffTemplateParams`, `diffCategories`, `diffWikilinks`
 - Clusters & activity: `detectEditClusters`, `detectTalkActivitySpikes`
+- **Semantic enrichment** (v0.5.0+): `computeCertaintyProfile`, `computeDirectionSignal`, `computeEditMagnitude`, `computeContentChange`, `extractKeyTerms`, `extractQuantitativeFindings`
 
 ### `@refract-org/cli`
 

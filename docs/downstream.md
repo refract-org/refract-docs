@@ -161,6 +161,7 @@ Use a single adapter file as the import boundary between Refract and your codeba
 export type { EvidenceEvent, FactProvenance, AnalyzerConfig } from '@refract-org/evidence-graph';
 export { EVENT_SCHEMA_VERSION, DEFAULT_ANALYZER_CONFIG, createEventIdentity } from '@refract-org/evidence-graph';
 export { sectionDiffer, citationTracker, revertDetector, detectEditClusters } from '@refract-org/analyzers';
+export { computeCertaintyProfile, computeDirectionSignal, extractQuantitativeFindings } from '@refract-org/analyzers';
 export { buildStructuredEvents } from '../adapter/build-events';
 
 // repository.ts — D1 insert
