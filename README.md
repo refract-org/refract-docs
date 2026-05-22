@@ -27,7 +27,7 @@ See [quickstart](https://refract-org.github.io/refract-docs/quickstart/) for a f
 | `@refract-org/cli` | [![npm](https://img.shields.io/npm/v/@refract-org/cli)](https://www.npmjs.com/package/@refract-org/cli) | AGPL-3.0 | CLI tool (`refract` / `wikihistory`, `classify` inference) |
 | `@refract-org/eval` | [![npm](https://img.shields.io/npm/v/@refract-org/eval)](https://www.npmjs.com/package/@refract-org/eval) | Evaluation harness |
 | `@refract-org/persistence` | Not published | AGPL-3.0 | SQLite storage |
-| `@refract-org/observable` | Not published | AGPL-3.0 | Observable data loader |
+| Observable recipe | — | — | [Copy-paste pattern](./docs/sdk.md#observable-framework-data-loader) for Observable Framework data loaders |
 
 ## Project status
 

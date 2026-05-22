@@ -84,7 +84,7 @@ Ground truth labels use this format:
 
 ## Adding a new benchmark page
 
-1. Create a synthetic revision history (see `refract-demo-data` for examples)
+1. Create a synthetic revision history (see `demo-data/` in the refract monorepo for examples)
 2. Hand-label ground truth events for every deterministic change in the revision range
 3. Add the page title and ground truth labels to the eval package's benchmark registry
 4. Run `refract eval --page "NewPage"` to verify the analyzer detects your labeled events
