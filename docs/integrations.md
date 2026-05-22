@@ -49,7 +49,7 @@ Refract produces a deterministic event stream — standard NDJSON with typed sch
 | Tool | How | Docs |
 |---|---|---|
 | **Jupyter** | `refract-py` → pandas DataFrame → matplotlib/Altair. | [Python SDK tutorial](tutorials/python-sdk.md) |
-| **Observable Framework** | `@refract-org/observable` data loader. | [Notebooks](notebooks.md) |
+| **Observable Framework** | [Data loader recipe](./sdk.md#observable-framework-data-loader). | [Notebooks](notebooks.md) |
 | **Marimo** | Reactive notebook runtime for live event stream analysis. | [Notebooks](notebooks.md) |
 | **Mermaid / Graphviz** | `refract visualize --format mermaid` produces diagrams. | [CLI](cli.md#refract-visualize) |
 

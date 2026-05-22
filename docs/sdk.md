@@ -160,15 +160,52 @@ const events = await db.getEvents({ pageTitle: "Earth" });
 
 Key exports: `Persistence` (class), `PersistenceAdapter` (interface), `PersistenceConfig`
 
-### `@refract-org/observable`
+### Observable Framework data loader
 
-Observable Framework data loader for embedding Refract queries in Observable dashboards.
+Recipe for embedding Refract queries in [Observable Framework](https://observablehq.com/framework/) dashboards. Copy the loader pattern directly — it is not a published npm package.
 
 ```typescript
-import { RefractDataLoader } from "@refract-org/observable";
+import { readFileSync } from "node:fs";
+
+export interface RefractLoaderOptions {
+  path: string;
+  format?: "json" | "sqlite";
+}
+
+export class RefractLoader {
+  private path: string;
+  private format: "json" | "sqlite";
+
+  constructor(options: RefractLoaderOptions) {
+    this.path = options.path;
+    this.format = options.format ?? (options.path.endsWith(".db") ? "sqlite" : "json");
+  }
+
+  async load(): Promise<Record<string, unknown>> {
+    if (this.format === "json") {
+      const raw = readFileSync(this.path, "utf-8");
+      return JSON.parse(raw) as Record<string, unknown>;
+    }
+    const { Database } = await import("bun:sqlite");
+    const db = new Database(this.path, { readonly: true });
+    const events = db.query("SELECT * FROM evidence_events").all();
+    const revisions = db.query("SELECT * FROM revisions").all();
+    db.close();
+    return { events, revisions };
+  }
+}
+
+export function refractLoader(options: RefractLoaderOptions): RefractLoader {
+  return new RefractLoader(options);
+}
 ```
 
-This package is designed for use with [Observable Framework](https://observablehq.com/framework/) data loaders. It is not published to npm — use from source or copy the loader pattern directly.
+Usage in Observable:
+
+```js
+import { refractLoader } from "./data-loader.ts";
+const data = refractLoader({ path: "./bitcoin-analysis.json" });
+```
 
 ---
 
