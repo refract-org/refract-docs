@@ -125,6 +125,9 @@ function wrapHTML(title, content, currentSlug) {
   <link rel="stylesheet" href="${BASE}style.css">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>◈</text></svg>">
   <meta name="description" content="Refract — the open claim-history layer for public knowledge. Deterministic event stream of claims, sources, and disputes across revision histories.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Manrope:wght@300;400;500;600;700&family=Recursive:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
   <input type="checkbox" id="menu-toggle" class="menu-toggle">
