@@ -15,9 +15,12 @@
   },
   "scripts": {
     "build": "node build.mjs",
-    "test": "node build.mjs"
+    "test": "node build.mjs",
+    "lint": "biome check .",
+    "format": "biome format --write ."
   },
   "devDependencies": {
+    "@biomejs/biome": "^2.4.15",
     "marked": "^15.0.0"
   }
 }
