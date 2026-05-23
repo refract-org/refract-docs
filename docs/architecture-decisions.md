@@ -98,7 +98,7 @@ service copyleft), GPLv3 (doesn't cover SaaS/network use — AGPL closes this ga
 
 ## No model in the pipeline
 
-**Decision**: The L1 deterministic pipeline never calls a model. No LLM, no ML, no
+**Decision**: The deterministic pipeline never calls a model. No LLM, no ML, no
 randomness. Pure functions of wikitext.
 
 **Why**: Reproducibility is the foundation. If the engine calls a model, the same

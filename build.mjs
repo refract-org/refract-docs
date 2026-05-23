@@ -1,122 +1,122 @@
-import { readFile, writeFile, mkdir, readdir, rm, cp } from 'node:fs/promises';
-import { join, dirname, basename } from 'node:path';
-import { fileURLToPath } from 'node:url';
-import { marked } from 'marked';
+import { cp, mkdir, readdir, readFile, rm, writeFile } from "node:fs/promises";
+import { basename, dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
+import { marked } from "marked";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const DOCS_DIR = join(__dirname, 'docs');
-const DIST_DIR = join(__dirname, 'dist');
-const ASSETS_DIR = join(__dirname, 'assets');
-const BASE = process.env.BASE || '/refract-docs/';
+const DOCS_DIR = join(__dirname, "docs");
+const DIST_DIR = join(__dirname, "dist");
+const ASSETS_DIR = join(__dirname, "assets");
+const BASE = process.env.BASE || "/refract-docs/";
 
 const NAV = [
-  { title: 'Home', slug: 'index' },
-  {
-    title: 'Getting Started',
-    slug: null,
-    children: [
-      { title: 'Why Refract', slug: 'why-refract' },
-      { title: 'Live Demo', slug: 'demo' },
-      { title: 'Quick Start', slug: 'quickstart' },
-      { title: 'Complete Workflow', slug: 'complete-workflow' },
-      { title: 'Install', slug: 'install' },
-      { title: 'Concepts', slug: 'concepts' },
-    ],
-  },
-  {
-    title: 'Reference',
-    slug: null,
-    children: [
-      { title: 'CLI', slug: 'cli' },
-      { title: 'SDK / Packages', slug: 'sdk' },
-      { title: 'Event Schema', slug: 'schema' },
-      { title: 'Event Taxonomy', slug: 'events' },
-      { title: 'Depth Levels', slug: 'depth' },
-      { title: 'Bundles & Manifests', slug: 'bundle-manifest' },
-      { title: 'Evaluation', slug: 'eval' },
-      { title: 'Architecture Decisions', slug: 'architecture-decisions' },
-    ],
-  },
-  {
-    title: 'Integration',
-    slug: null,
-    children: [
-      { title: 'Downstream Integration', slug: 'downstream' },
-      { title: 'MCP / AI Agents', slug: 'mcp' },
-      { title: 'Analytics with DuckDB', slug: 'analytics' },
-      { title: 'Notebooks', slug: 'notebooks' },
-      { title: 'Cron Monitoring', slug: 'cron' },
-    ],
-  },
-  {
-    title: 'Tutorials',
-    slug: null,
-    children: [
-      { title: 'Wikipedia History', slug: 'tutorials/wikipedia-history' },
-      { title: 'Fandom Canon', slug: 'tutorials/fandom-canon' },
-      { title: 'Citation Churn', slug: 'tutorials/citation-churn' },
-      { title: 'Dispute Timeline', slug: 'tutorials/dispute-timeline' },
-      { title: 'Cross-Wiki Diff', slug: 'tutorials/cross-wiki-diff' },
-    ],
-  },
-  {
-    title: 'Appendix',
-    slug: null,
-    children: [
-      { title: 'Glossary', slug: 'glossary' },
-      { title: 'FAQ', slug: 'faq' },
-      { title: 'Interpreting Output', slug: 'interpretation' },
-      { title: 'Security', slug: 'security' },
-      { title: 'Boundary', slug: 'boundary' },
-      { title: 'Naming', slug: 'naming' },
-      { title: 'Frontier Use Cases', slug: 'frontier-use-cases' },
-      { title: 'Contributing to Docs', slug: 'contributing-docs' },
-    ],
-  },
+	{ title: "Home", slug: "index" },
+	{
+		title: "Getting Started",
+		slug: null,
+		children: [
+			{ title: "Why Refract", slug: "why-refract" },
+			{ title: "Live Demo", slug: "demo" },
+			{ title: "Quick Start", slug: "quickstart" },
+			{ title: "Complete Workflow", slug: "complete-workflow" },
+			{ title: "Install", slug: "install" },
+			{ title: "Concepts", slug: "concepts" },
+		],
+	},
+	{
+		title: "Reference",
+		slug: null,
+		children: [
+			{ title: "CLI", slug: "cli" },
+			{ title: "SDK / Packages", slug: "sdk" },
+			{ title: "Event Schema", slug: "schema" },
+			{ title: "Event Taxonomy", slug: "events" },
+			{ title: "Depth Levels", slug: "depth" },
+			{ title: "Bundles & Manifests", slug: "bundle-manifest" },
+			{ title: "Evaluation", slug: "eval" },
+			{ title: "Architecture Decisions", slug: "architecture-decisions" },
+		],
+	},
+	{
+		title: "Integration",
+		slug: null,
+		children: [
+			{ title: "Downstream Integration", slug: "downstream" },
+			{ title: "MCP / AI Agents", slug: "mcp" },
+			{ title: "Analytics with DuckDB", slug: "analytics" },
+			{ title: "Notebooks", slug: "notebooks" },
+			{ title: "Cron Monitoring", slug: "cron" },
+		],
+	},
+	{
+		title: "Tutorials",
+		slug: null,
+		children: [
+			{ title: "Wikipedia History", slug: "tutorials/wikipedia-history" },
+			{ title: "Fandom Canon", slug: "tutorials/fandom-canon" },
+			{ title: "Citation Churn", slug: "tutorials/citation-churn" },
+			{ title: "Dispute Timeline", slug: "tutorials/dispute-timeline" },
+			{ title: "Cross-Wiki Diff", slug: "tutorials/cross-wiki-diff" },
+		],
+	},
+	{
+		title: "Appendix",
+		slug: null,
+		children: [
+			{ title: "Glossary", slug: "glossary" },
+			{ title: "FAQ", slug: "faq" },
+			{ title: "Interpreting Output", slug: "interpretation" },
+			{ title: "Security", slug: "security" },
+			{ title: "Boundary", slug: "boundary" },
+			{ title: "Naming", slug: "naming" },
+			{ title: "Frontier Use Cases", slug: "frontier-use-cases" },
+			{ title: "Contributing to Docs", slug: "contributing-docs" },
+		],
+	},
 ];
 
 function resolveTitle(slug) {
-  for (const item of NAV) {
-    if (item.slug === slug) return item.title;
-    if (item.children) {
-      for (const child of item.children) {
-        if (child.slug === slug) return child.title;
-      }
-    }
-  }
-  return basename(slug);
+	for (const item of NAV) {
+		if (item.slug === slug) return item.title;
+		if (item.children) {
+			for (const child of item.children) {
+				if (child.slug === slug) return child.title;
+			}
+		}
+	}
+	return basename(slug);
 }
 
 function slugHref(slug) {
-  return slug === 'index' ? BASE : `${BASE}${slug}/`;
+	return slug === "index" ? BASE : `${BASE}${slug}/`;
 }
 
 function renderNav(currentSlug) {
-  function link(item) {
-    const isActive = item.slug === currentSlug;
-    const cls = isActive ? 'nav-link active' : 'nav-link';
-    return `<a href="${slugHref(item.slug)}" class="${cls}">${item.title}</a>`;
-  }
+	function link(item) {
+		const isActive = item.slug === currentSlug;
+		const cls = isActive ? "nav-link active" : "nav-link";
+		return `<a href="${slugHref(item.slug)}" class="${cls}">${item.title}</a>`;
+	}
 
-  let html = '';
-  for (const item of NAV) {
-    if (item.children) {
-      const parentActive = item.children.some(c => c.slug === currentSlug);
-      html += `<div class="nav-section">${item.title}</div>`;
-      html += `<div class="nav-group${parentActive ? ' open' : ''}">`;
-      for (const child of item.children) {
-        html += link(child);
-      }
-      html += '</div>';
-    } else {
-      html += link(item);
-    }
-  }
-  return html;
+	let html = "";
+	for (const item of NAV) {
+		if (item.children) {
+			const parentActive = item.children.some((c) => c.slug === currentSlug);
+			html += `<div class="nav-section">${item.title}</div>`;
+			html += `<div class="nav-group${parentActive ? " open" : ""}">`;
+			for (const child of item.children) {
+				html += link(child);
+			}
+			html += "</div>";
+		} else {
+			html += link(item);
+		}
+	}
+	return html;
 }
 
 function wrapHTML(title, content, currentSlug) {
-  return `<!DOCTYPE html>
+	return `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -157,75 +157,88 @@ function wrapHTML(title, content, currentSlug) {
 </html>`;
 }
 
-function rewriteLink(href, sourceDir = '') {
-  if (!href) return href;
-  if (href.startsWith('http') || href.startsWith('#')) return href;
-  href = href.replace(/\.md$/, '/');
-  if (href === 'index/' || href === 'index') return BASE;
-  if (href.startsWith('/')) return BASE + href.slice(1);
-  if (sourceDir) href = sourceDir + '/' + href;
-  return BASE + href;
+function rewriteLink(href, sourceDir = "") {
+	if (!href) return href;
+	if (href.startsWith("http") || href.startsWith("#")) return href;
+	href = href.replace(/\.md$/, "/");
+	if (href === "index/" || href === "index") return BASE;
+	if (href.startsWith("/")) return BASE + href.slice(1);
+	if (sourceDir) href = `${sourceDir}/${href}`;
+	return BASE + href;
 }
 
-async function collectFiles(dir, base = '') {
-  const entries = await readdir(dir, { withFileTypes: true });
-  const files = [];
-  for (const entry of entries) {
-    const fp = join(dir, entry.name);
-    const rel = base ? `${base}/${entry.name}` : entry.name;
-    if (entry.isDirectory()) {
-      files.push(...await collectFiles(fp, rel));
-    } else if (entry.name.endsWith('.md')) {
-      files.push({ path: fp, slug: rel.replace(/\.md$/, '') });
-    }
-  }
-  return files;
+async function collectFiles(dir, base = "") {
+	const entries = await readdir(dir, { withFileTypes: true });
+	const files = [];
+	const assets = [];
+	for (const entry of entries) {
+		const fp = join(dir, entry.name);
+		const rel = base ? `${base}/${entry.name}` : entry.name;
+		if (entry.isDirectory()) {
+			const res = await collectFiles(fp, rel);
+			files.push(...res.files);
+			assets.push(...res.assets);
+		} else if (entry.name.endsWith(".md")) {
+			files.push({ path: fp, slug: rel.replace(/\.md$/, "") });
+		} else {
+			assets.push({ path: fp, rel });
+		}
+	}
+	return { files, assets };
 }
 
 async function build() {
-  await rm(DIST_DIR, { recursive: true, force: true });
-  await mkdir(DIST_DIR, { recursive: true });
+	await rm(DIST_DIR, { recursive: true, force: true });
+	await mkdir(DIST_DIR, { recursive: true });
 
-  const files = await collectFiles(DOCS_DIR);
+	const { files, assets } = await collectFiles(DOCS_DIR);
 
-  const renderer = new marked.Renderer();
-  let currentSourceDir = '';
-  renderer.link = function ({ href, title, text }) {
-    const h = rewriteLink(href, currentSourceDir);
-    const t = title ? ` title="${title}"` : '';
-    return `<a href="${h}"${t}>${text}</a>`;
-  };
-  renderer.image = function ({ href, title, text }) {
-    const h = rewriteLink(href, currentSourceDir);
-    const t = title ? ` title="${title}"` : '';
-    return `<img src="${h}" alt="${text}"${t}>`;
-  };
+	const renderer = new marked.Renderer();
+	let currentSourceDir = "";
+	renderer.link = ({ href, title, text }) => {
+		const h = rewriteLink(href, currentSourceDir);
+		const t = title ? ` title="${title}"` : "";
+		return `<a href="${h}"${t}>${text}</a>`;
+	};
+	renderer.image = ({ href, title, text }) => {
+		const h = rewriteLink(href, currentSourceDir);
+		const t = title ? ` title="${title}"` : "";
+		return `<img src="${h}" alt="${text}"${t}>`;
+	};
 
-  marked.use({ gfm: true, breaks: false });
+	marked.use({ gfm: true, breaks: false });
 
-  for (const file of files) {
-    const raw = await readFile(file.path, 'utf-8');
-    currentSourceDir = dirname(file.slug);
-    if (currentSourceDir === '.') currentSourceDir = '';
-    const body = marked.parse(raw, { renderer });
-    const h1Match = raw.match(/^#\s+(.+)/m);
-    const title = h1Match ? h1Match[1] : resolveTitle(file.slug);
-    const html = wrapHTML(title, body, file.slug);
+	for (const file of files) {
+		const raw = await readFile(file.path, "utf-8");
+		currentSourceDir = dirname(file.slug);
+		if (currentSourceDir === ".") currentSourceDir = "";
+		const body = marked.parse(raw, { renderer });
+		const h1Match = raw.match(/^#\s+(.+)/m);
+		const title = h1Match ? h1Match[1] : resolveTitle(file.slug);
+		const html = wrapHTML(title, body, file.slug);
 
-    if (file.slug === 'index') {
-      await writeFile(join(DIST_DIR, 'index.html'), html);
-    } else {
-      const outDir = join(DIST_DIR, file.slug);
-      await mkdir(outDir, { recursive: true });
-      await writeFile(join(outDir, 'index.html'), html);
-    }
-  }
+		if (file.slug === "index") {
+			await writeFile(join(DIST_DIR, "index.html"), html);
+		} else {
+			const outDir = join(DIST_DIR, file.slug);
+			await mkdir(outDir, { recursive: true });
+			await writeFile(join(outDir, "index.html"), html);
+		}
+	}
 
-  await cp(ASSETS_DIR, DIST_DIR, { recursive: true });
-  console.log(`Built ${files.length} pages to dist/`);
+	for (const asset of assets) {
+		const dest = join(DIST_DIR, asset.rel);
+		await mkdir(dirname(dest), { recursive: true });
+		await cp(asset.path, dest);
+	}
+
+	await cp(ASSETS_DIR, DIST_DIR, { recursive: true });
+	console.log(
+		`Built ${files.length} pages and copied ${assets.length} assets to dist/`,
+	);
 }
 
-build().catch(err => {
-  console.error(err);
-  process.exit(1);
+build().catch((err) => {
+	console.error(err);
+	process.exit(1);
 });

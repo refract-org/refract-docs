@@ -173,9 +173,9 @@ contested.to_json("contested-events.jsonl", orient="records", lines=True)
 
 ## Next steps
 
-- [Analyze with DuckDB](../analytics.md)
-- [Monitor citation churn on specific pages](citation-churn.md)
-- [Build a dispute timeline](dispute-timeline.md)
+- [Analyze with DuckDB](analytics.md)
+- [Monitor citation churn on specific pages](tutorials/citation-churn.md)
+- [Build a dispute timeline](tutorials/dispute-timeline.md)
 
 ## Using the Python SDK (`refract-py`)
 

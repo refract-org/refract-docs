@@ -157,15 +157,15 @@ revision range and you get identical output.
 
 ## What to do next
 
-- **Automate monitoring**: Set up `refract cron` to re-observe daily ([cron guide](../cron.md))
+- **Automate monitoring**: Set up `refract cron` to re-observe daily ([cron guide](cron.md))
 - **Compare across wikis**: Run `refract diff` on Bitcoin across English and Simple
-  Wikipedia ([cross-wiki tutorial](../tutorials/cross-wiki-diff.md))
+  Wikipedia ([cross-wiki tutorial](tutorials/cross-wiki-diff.md))
 - **Build a dashboard**: Load events into DuckDB and connect to Grafana or
-  Observable ([analytics guide](../analytics.md))
+  Observable ([analytics guide](analytics.md))
 - **Integrate with RAG**: Use claim stability signals to filter retrieval results
-  ([downstream guide](../downstream.md))
+  ([downstream guide](downstream.md))
 - **Verify accuracy**: Run `refract eval` to benchmark analyzer precision
-  ([eval guide](../eval.md))
+  ([eval guide](eval.md))
 
 ## The same workflow for any page
 

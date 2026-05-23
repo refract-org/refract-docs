@@ -103,5 +103,5 @@ LIMIT 10;
 ## Next
 
 - [Full event taxonomy](events.md) — all 26 event types
-- [Analytics with DuckDB](../analytics.md) — pre-built SQL views
-- [Wikipedia history tutorial](wikipedia-history.md) — first full walkthrough
+- [Analytics with DuckDB](analytics.md) — pre-built SQL views
+- [Wikipedia history tutorial](tutorials/wikipedia-history.md) — first full walkthrough

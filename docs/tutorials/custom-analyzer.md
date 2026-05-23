@@ -210,4 +210,4 @@ If your analyzer introduces exports that cross package boundaries incorrectly,
 
 - [SDK reference](../sdk.md) — all packages and their APIs
 - [Architecture decisions](../architecture-decisions.md) — why deterministic-only
-- [Workqueue protocol](../../refract/AGENTS.md) — how tasks are structured
+- [Workqueue protocol](https://github.com/refract-org/refract/blob/main/AGENTS.md) — how tasks are structured
