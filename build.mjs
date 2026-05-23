@@ -1,3 +1,4 @@
+import { execFileSync } from "node:child_process";
 import { cp, mkdir, readdir, readFile, rm, writeFile } from "node:fs/promises";
 import { basename, dirname, join, posix } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -8,6 +9,22 @@ const DOCS_DIR = join(__dirname, "docs");
 const DIST_DIR = join(__dirname, "dist");
 const ASSETS_DIR = join(__dirname, "assets");
 const BASE = process.env.BASE || "/refract-docs/";
+
+function assetVersion() {
+	if (process.env.GITHUB_SHA) return process.env.GITHUB_SHA.slice(0, 12);
+	try {
+		return execFileSync("git", ["rev-parse", "--short=12", "HEAD"], {
+			cwd: __dirname,
+			encoding: "utf-8",
+		})
+			.trim()
+			.replace(/[^\w.-]/g, "");
+	} catch {
+		return "dev";
+	}
+}
+
+const ASSET_VERSION = assetVersion();
 
 const NAV = [
 	{ title: "Home", slug: "index" },
@@ -141,7 +158,7 @@ function wrapHTML(title, content, currentSlug) {
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>${title} — Refract</title>
-  <link rel="stylesheet" href="${BASE}style.css">
+  <link rel="stylesheet" href="${BASE}style.css?v=${ASSET_VERSION}">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>◈</text></svg>">
   <meta name="description" content="Refract — the open claim-history layer for public knowledge. Deterministic event stream of claims, sources, and disputes across revision histories.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
