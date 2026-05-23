@@ -52,6 +52,27 @@ refract export "Earth" --format ndjson > earth-events.jsonl
 
 Use `refract export` to format output as json, csv, ndjson, html, a signed bundle (`--bundle`), or a replay manifest (`--manifest`). Add `--flatten` to produce flat column-oriented CSV suitable for analytical tools.
 
+## Try it: trace a claim
+
+Now find when a specific word first appeared and track how it changed:
+
+```bash
+refract claim "Earth" --text "climate" -c
+```
+
+Refract scans every revision for "climate," reports when it was first added, modified, or removed, and summarizes its status (STABLE, REMOVED, CONTESTED). Try a term you expect to be disputed — any word or phrase works.
+
+## View the results visually
+
+The standalone [Refract UI](tutorials/refract-ui.md) loads JSONL output and renders timelines, diffs, citation graphs, and event breakdowns. Export your analysis and drop the file into the browser:
+
+```bash
+refract export "Earth" --format ndjson > earth-events.jsonl
+# then open http://localhost:5173 in Refract UI and drag the file in
+```
+
+See the [Refract UI tutorial](tutorials/refract-ui.md) for the full walkthrough.
+
 ## Classify events with a model
 
 ```bash

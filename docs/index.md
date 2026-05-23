@@ -111,7 +111,7 @@ These aren't tutorials — they're the frontier of what the architecture enables
 - [BYO-inference](tutorials/byo-inference.md) — [Custom analyzer](tutorials/custom-analyzer.md)
 - [Custom eval labels](tutorials/custom-eval.md) — [Private wikis](tutorials/private-wiki.md)
 - [Non-English wikis](tutorials/non-english.md) — [Summarization](tutorials/summarization.md)
-- [Custom adapter](tutorials/custom-adapter.md) — [Model evaluation](tutorials/model-evaluation.md)
+- [Refract UI](tutorials/refract-ui.md) — [Custom adapter](tutorials/custom-adapter.md) — [Model evaluation](tutorials/model-evaluation.md)
 
 ### Appendix
 - [Glossary](glossary.md) — [Troubleshooting / FAQ](faq.md)

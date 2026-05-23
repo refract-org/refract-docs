@@ -57,6 +57,7 @@ const NAV = [
 			{ title: "Citation Churn", slug: "tutorials/citation-churn" },
 			{ title: "Dispute Timeline", slug: "tutorials/dispute-timeline" },
 			{ title: "Cross-Wiki Diff", slug: "tutorials/cross-wiki-diff" },
+			{ title: "Refract UI", slug: "tutorials/refract-ui" },
 		],
 	},
 	{
