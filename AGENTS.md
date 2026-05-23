@@ -2,6 +2,32 @@
 
 Refract-docs is the public documentation site for the Refract project — an open-source deterministic observation engine for public revision histories.
 
+## Quick Start
+
+```bash
+npm install          # Install dependencies
+npm run build        # Build static HTML — docs/ → dist/
+npm run lint         # Biome check
+npm run test         # Vitest (verifies docs compile)
+```
+
+## Tooling
+
+- **Package manager:** npm
+- **Linter/Formatter:** Biome
+- **Tests:** Vitest
+- **Pre-commit:** Husky runs Biome on staged files
+- **CI:** ci.yml (main) + deploy.yml (GitHub Pages)
+- **Commit style:** Conventional Commits
+
+## Verification
+
+```bash
+npm run lint     # Biome check
+npm run test     # Build verification
+npm run build    # Production build
+```
+
 ## Repository structure
 
 ```
