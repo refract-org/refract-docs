@@ -1,11 +1,16 @@
+import { execFile } from "node:child_process";
 import { existsSync } from "node:fs";
-import { readdir, readFile } from "node:fs/promises";
+import { readdir, readFile, stat } from "node:fs/promises";
 import { basename, dirname, join, resolve } from "node:path";
+import { promisify } from "node:util";
 import { marked } from "marked";
-import { describe, expect, it } from "vitest";
+import { beforeAll, describe, expect, it } from "vitest";
 
 const ROOT_DIR = resolve(__dirname, "..");
 const DOCS_DIR = join(ROOT_DIR, "docs");
+const DIST_DIR = join(ROOT_DIR, "dist");
+const SITE_BASE = "/refract-docs";
+const execFileAsync = promisify(execFile);
 
 // Helper to recursively find all .md files
 async function findMarkdownFiles(dir: string): Promise<string[]> {
@@ -16,6 +21,20 @@ async function findMarkdownFiles(dir: string): Promise<string[]> {
 		if (entry.isDirectory()) {
 			files.push(...(await findMarkdownFiles(fp)));
 		} else if (entry.name.endsWith(".md")) {
+			files.push(fp);
+		}
+	}
+	return files;
+}
+
+async function findHtmlFiles(dir: string): Promise<string[]> {
+	const entries = await readdir(dir, { withFileTypes: true });
+	const files: string[] = [];
+	for (const entry of entries) {
+		const fp = join(dir, entry.name);
+		if (entry.isDirectory()) {
+			files.push(...(await findHtmlFiles(fp)));
+		} else if (entry.name.endsWith(".html")) {
 			files.push(fp);
 		}
 	}
@@ -171,6 +190,81 @@ function checkLink(
 	return { isValid: false, resolvedPath };
 }
 
+function isExternalLink(href: string): boolean {
+	return /^(https?:|mailto:|data:|javascript:)/.test(href);
+}
+
+function normalizeUrlPath(path: string): string {
+	const parts: string[] = [];
+	for (const part of path.split("/")) {
+		if (!part || part === ".") continue;
+		if (part === "..") {
+			parts.pop();
+		} else {
+			parts.push(part);
+		}
+	}
+	return `/${parts.join("/")}${path.endsWith("/") ? "/" : ""}`;
+}
+
+function escapeRegExp(value: string): string {
+	return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+async function checkGeneratedLink(
+	sourceFile: string,
+	href: string,
+): Promise<{ isValid: boolean; resolvedPath: string }> {
+	if (isExternalLink(href) || href.startsWith("#")) {
+		return { isValid: true, resolvedPath: href };
+	}
+
+	const [pathAndQuery, hash] = href.split("#");
+	const [pathPart] = pathAndQuery.split("?");
+	if (!pathPart) {
+		return { isValid: true, resolvedPath: href };
+	}
+
+	const relativeDir = dirname(sourceFile)
+		.replace(DIST_DIR, "")
+		.replaceAll("\\", "/");
+	const pagePath = `${SITE_BASE}${relativeDir === "/" ? "" : relativeDir}/`;
+	const urlPath = normalizeUrlPath(
+		pathPart.startsWith("/") ? pathPart : `${pagePath}${pathPart}`,
+	);
+
+	if (!(urlPath === `${SITE_BASE}/` || urlPath.startsWith(`${SITE_BASE}/`))) {
+		return { isValid: false, resolvedPath: urlPath };
+	}
+
+	const diskPath = urlPath.slice(SITE_BASE.length) || "/";
+	let resolvedPath = diskPath.endsWith("/")
+		? join(DIST_DIR, diskPath, "index.html")
+		: join(DIST_DIR, diskPath);
+
+	try {
+		const pathStat = await stat(resolvedPath);
+		if (pathStat.isDirectory()) {
+			resolvedPath = join(resolvedPath, "index.html");
+			await stat(resolvedPath);
+		}
+		if (hash) {
+			const html = await readFile(resolvedPath, "utf-8");
+			const decodedHash = decodeURIComponent(hash);
+			const idPattern = new RegExp(`id=["']${escapeRegExp(decodedHash)}["']`);
+			if (!idPattern.test(html)) {
+				return {
+					isValid: false,
+					resolvedPath: `${resolvedPath}#${decodedHash}`,
+				};
+			}
+		}
+		return { isValid: true, resolvedPath };
+	} catch {
+		return { isValid: false, resolvedPath };
+	}
+}
+
 describe("Documentation Links Validator", async () => {
 	const mdFiles = await findMarkdownFiles(DOCS_DIR);
 	// Also include the root README.md
@@ -197,4 +291,35 @@ describe("Documentation Links Validator", async () => {
 			).toEqual([]);
 		});
 	}
+});
+
+describe("Generated site links", async () => {
+	beforeAll(async () => {
+		await execFileAsync(process.execPath, ["build.mjs"], { cwd: ROOT_DIR });
+	});
+
+	it("should have valid internal links after build", async () => {
+		const htmlFiles = await findHtmlFiles(DIST_DIR);
+		const invalidLinks: string[] = [];
+
+		for (const file of htmlFiles) {
+			const relativeFilePath = file.replace(`${DIST_DIR}/`, "");
+			const html = await readFile(file, "utf-8");
+			const hrefs = extractLinks(html);
+
+			for (const href of hrefs) {
+				const { isValid, resolvedPath } = await checkGeneratedLink(file, href);
+				if (!isValid) {
+					invalidLinks.push(
+						`${relativeFilePath}: ${href} (resolved: ${resolvedPath})`,
+					);
+				}
+			}
+		}
+
+		expect(
+			invalidLinks,
+			`Found broken generated links:\n${invalidLinks.join("\n")}`,
+		).toEqual([]);
+	});
 });

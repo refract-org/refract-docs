@@ -1,5 +1,5 @@
 import { cp, mkdir, readdir, readFile, rm, writeFile } from "node:fs/promises";
-import { basename, dirname, join } from "node:path";
+import { basename, dirname, join, posix } from "node:path";
 import { fileURLToPath } from "node:url";
 import { marked } from "marked";
 
@@ -116,6 +116,24 @@ function renderNav(currentSlug) {
 	return html;
 }
 
+function plainText(tokens) {
+	return tokens
+		.map((token) => {
+			if (token.tokens) return plainText(token.tokens);
+			return token.text ?? token.raw ?? "";
+		})
+		.join("");
+}
+
+function slugifyHeading(text) {
+	return text
+		.toLowerCase()
+		.trim()
+		.replace(/[`]/g, "")
+		.replace(/[^\w\s-]/g, "")
+		.replace(/\s/g, "-");
+}
+
 function wrapHTML(title, content, currentSlug) {
 	return `<!DOCTYPE html>
 <html lang="en">
@@ -161,11 +179,21 @@ function wrapHTML(title, content, currentSlug) {
 function rewriteLink(href, sourceDir = "") {
 	if (!href) return href;
 	if (href.startsWith("http") || href.startsWith("#")) return href;
-	href = href.replace(/\.md$/, "/");
-	if (href === "index/" || href === "index") return BASE;
-	if (href.startsWith("/")) return BASE + href.slice(1);
-	if (sourceDir) href = `${sourceDir}/${href}`;
-	return BASE + href;
+
+	const [, rawPath = "", suffix = ""] = href.match(/^([^?#]*)([?#].*)?$/) ?? [];
+	if (!rawPath) return href;
+
+	let path = rawPath.replace(/\.md$/, "/");
+	if (sourceDir && !path.startsWith("/")) {
+		path = `${sourceDir}/${path}`;
+	}
+
+	path = posix.normalize(path);
+	if (path === "." || path === "index") return `${BASE}${suffix}`;
+	if (path === "index/") return `${BASE}${suffix}`;
+
+	const normalizedPath = path.startsWith("/") ? path.slice(1) : path;
+	return `${BASE}${normalizedPath}${suffix}`;
 }
 
 async function collectFiles(dir, base = "") {
@@ -196,6 +224,7 @@ async function build() {
 
 	const renderer = new marked.Renderer();
 	let currentSourceDir = "";
+	let currentHeadingCounts = new Map();
 	renderer.link = ({ href, title, text }) => {
 		const h = rewriteLink(href, currentSourceDir);
 		const t = title ? ` title="${title}"` : "";
@@ -206,6 +235,14 @@ async function build() {
 		const t = title ? ` title="${title}"` : "";
 		return `<img src="${h}" alt="${text}"${t}>`;
 	};
+	renderer.heading = function ({ tokens, depth }) {
+		const text = this.parser.parseInline(tokens);
+		const baseSlug = slugifyHeading(plainText(tokens));
+		const count = currentHeadingCounts.get(baseSlug) ?? 0;
+		currentHeadingCounts.set(baseSlug, count + 1);
+		const slug = count === 0 ? baseSlug : `${baseSlug}-${count}`;
+		return `<h${depth} id="${slug}">${text}</h${depth}>`;
+	};
 
 	marked.use({ gfm: true, breaks: false });
 
@@ -213,6 +250,7 @@ async function build() {
 		const raw = await readFile(file.path, "utf-8");
 		currentSourceDir = dirname(file.slug);
 		if (currentSourceDir === ".") currentSourceDir = "";
+		currentHeadingCounts = new Map();
 		const body = marked.parse(raw, { renderer });
 		const h1Match = raw.match(/^#\s+(.+)/m);
 		const title = h1Match ? h1Match[1] : resolveTitle(file.slug);
