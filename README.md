@@ -1,5 +1,9 @@
 # Refract Docs
 
+<p align="center">
+  <img src="docs/assets/refract-docs-demo.gif" alt="refract-docs demo animation" width="720">
+</p>
+
 Public documentation for [Refract](https://github.com/refract-org/refract) — open infrastructure for knowledge-change provenance.
 
 **Refract is open infrastructure for agent-readable knowledge change. It turns source histories into replayable semantic change events about claims, citations, and evidence bindings.**
