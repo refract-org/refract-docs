@@ -361,6 +361,7 @@ body::before {
 	padding: 20px 24px;
 	border-radius: var(--radius);
 	border: 1px solid var(--border);
+	max-width: 100%;
 	overflow-x: auto;
 	margin: 1.2em 0;
 	font-size: 0.85rem;
@@ -368,12 +369,25 @@ body::before {
 }
 
 .content pre code {
+	display: block;
+	min-width: 0;
 	background: none;
 	color: inherit;
 	padding: 0;
 	font-size: inherit;
 	font-weight: 400;
 	border: none;
+}
+
+@media (max-width: 640px) {
+	.content pre {
+		padding: 16px;
+	}
+
+	.content pre code {
+		overflow-wrap: anywhere;
+		white-space: pre-wrap;
+	}
 }
 
 /* ── Tables ── */
