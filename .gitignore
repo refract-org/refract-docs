@@ -5,3 +5,23 @@ dist/
 .DS_Store
 opencode.json
 /.sisyphus
+
+# Tooling
+.cmux/
+.opencode/
+.codex/
+.agent/
+.wrangler/
+
+# Tooling
+.cmux/
+.opencode/
+.codex/
+.agent/
+
+# Tooling
+.cmux/
+.opencode/
+.codex/
+.agent/
+.wrangler/
