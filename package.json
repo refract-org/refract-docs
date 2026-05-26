@@ -3,7 +3,7 @@
 	"version": "0.1.0",
 	"private": true,
 	"type": "module",
-	"description": "Public documentation for Refract — the open-source deterministic observation engine for public revision histories",
+	"description": "Public documentation for Refract \u2014 the open-source deterministic observation engine for public revision histories",
 	"license": "CC-BY-4.0",
 	"repository": {
 		"type": "git",
@@ -18,7 +18,9 @@
 		"test": "vitest run",
 		"lint": "biome check .",
 		"format": "biome format --write .",
-		"prepare": "husky"
+		"prepare": "husky",
+		"assets:check": "bun run scripts/check-assets.ts",
+		"assets:generate": "bun run scripts/generate-scenes.ts"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "^2.4.15",
