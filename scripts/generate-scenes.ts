@@ -153,7 +153,7 @@ function buildOverlay(spec: SceneSpec, hue: number): string {
 
 	const fs = Math.max(10, Math.min(width, height) * 0.025);
 	svg += `<text x="${width - 16}" y="${height - 12}" font-family="system-ui,sans-serif" font-size="${fs}" fill="rgba(255,255,255,0.12)" text-anchor="end">${PROJECT}</text>`;
-	return svg + "</svg>";
+	return `${svg}</svg>`;
 }
 
 function main() {
@@ -223,8 +223,9 @@ function main() {
 			} else {
 				ok++;
 			}
-		} catch (e: any) {
-			console.error(`  ❌ ${scene}: ${e.stderr || e.message}`);
+		} catch (e) {
+			const errObj = e as { stderr?: string; message?: string };
+			console.error(`  ❌ ${scene}: ${errObj.stderr || errObj.message}`);
 			err++;
 		} finally {
 			try {
