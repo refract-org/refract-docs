@@ -20,6 +20,7 @@
 			{ "title": "SDK / Packages", "slug": "sdk" },
 			{ "title": "Event Schema", "slug": "schema" },
 			{ "title": "Event Taxonomy", "slug": "events" },
+			{ "title": "Temporal Model", "slug": "temporal-model" },
 			{ "title": "Depth Levels", "slug": "depth" },
 			{ "title": "Bundles & Manifests", "slug": "bundle-manifest" },
 			{ "title": "Evaluation", "slug": "eval" },
