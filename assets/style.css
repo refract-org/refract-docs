@@ -849,3 +849,210 @@ body::before {
 	font-size: 0.65rem;
 	color: var(--text-muted);
 }
+
+/* ── Features Grid ── */
+.features-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+	gap: 1.25rem;
+	margin: 2rem 0;
+}
+
+.feature-card {
+	background:
+		linear-gradient(180deg, rgba(255, 255, 255, 0.03), transparent 58%),
+		var(--bg-glass);
+	border: 1px solid var(--border);
+	border-radius: var(--radius-md);
+	padding: 1.5rem;
+	backdrop-filter: blur(18px);
+	transition:
+		border-color 0.2s ease,
+		transform 0.2s ease,
+		box-shadow 0.2s ease;
+	position: relative;
+	overflow: hidden;
+}
+
+.feature-card:hover {
+	border-color: rgba(45, 212, 191, 0.42);
+	transform: translateY(-2px);
+	box-shadow: 0 8px 24px rgba(45, 212, 191, 0.08);
+}
+
+.feature-card::before {
+	content: "";
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 2px;
+	background: linear-gradient(90deg, var(--accent), var(--accent-dim));
+	opacity: 0;
+	transition: opacity 0.2s ease;
+}
+
+.feature-card:hover::before {
+	opacity: 1;
+}
+
+.feature-icon {
+	width: 2.25rem;
+	height: 2.25rem;
+	display: grid;
+	place-items: center;
+	border: 1px solid var(--border);
+	border-radius: var(--radius-sm);
+	background: rgba(255, 255, 255, 0.03);
+	font-size: 1.5rem;
+	margin-bottom: 0.75rem;
+}
+
+.feature-card h3 {
+	font-family: var(--font-heading);
+	font-size: 1rem;
+	font-weight: 600;
+	color: #f0f2f8;
+	margin: 0 0 0.5rem;
+	border-bottom: none;
+	padding-bottom: 0;
+}
+
+.feature-card p {
+	font-size: 0.8125rem;
+	color: var(--text-muted);
+	margin: 0;
+	line-height: 1.5;
+}
+
+/* ── Use Case Grid ── */
+.usecase-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+	gap: 1.25rem;
+	margin: 2rem 0;
+}
+
+.usecase-card {
+	background:
+		linear-gradient(180deg, rgba(255, 255, 255, 0.025), transparent 60%),
+		var(--bg-glass);
+	border: 1px solid var(--border);
+	border-radius: var(--radius-md);
+	padding: 1.5rem;
+	display: flex;
+	flex-direction: column;
+	min-height: 100%;
+	backdrop-filter: blur(18px);
+	transition:
+		border-color 0.2s ease,
+		transform 0.2s ease,
+		box-shadow 0.2s ease;
+}
+
+.usecase-card:hover {
+	border-color: rgba(45, 212, 191, 0.36);
+	transform: translateY(-2px);
+	box-shadow: 0 8px 24px rgba(45, 212, 191, 0.06);
+}
+
+.usecase-badge {
+	align-self: flex-start;
+	background: var(--accent-soft);
+	color: var(--accent);
+	font-size: 0.65rem;
+	font-weight: 700;
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
+	padding: 2px 8px;
+	border-radius: 20px;
+	margin-bottom: 0.75rem;
+}
+
+.usecase-card h3 {
+	font-family: var(--font-heading);
+	font-size: 1.05rem;
+	font-weight: 600;
+	color: #f0f2f8;
+	margin: 0 0 0.5rem;
+	border-bottom: none;
+	padding-bottom: 0;
+}
+
+.usecase-card p {
+	font-size: 0.8125rem;
+	color: var(--text-muted);
+	margin: 0 0 1.25rem;
+	line-height: 1.5;
+	flex: 1;
+}
+
+.usecase-steps {
+	font-size: 0.78rem;
+	color: var(--text-dim);
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	flex-wrap: wrap;
+	padding-top: 0.85rem;
+	border-top: 1px solid var(--border);
+}
+
+.usecase-steps a {
+	color: var(--accent);
+	text-decoration: none;
+	font-weight: 500;
+	transition: color 0.15s ease;
+}
+
+.usecase-steps a:hover {
+	color: #5eead4;
+}
+
+/* ── Split Columns ── */
+.split-columns {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+	gap: 1.5rem;
+	margin: 2rem 0;
+}
+
+.column-card {
+	background:
+		linear-gradient(180deg, rgba(255, 255, 255, 0.025), transparent 60%),
+		var(--bg-glass);
+	border: 1px solid var(--border);
+	border-radius: var(--radius-md);
+	padding: 1.5rem;
+	backdrop-filter: blur(18px);
+}
+
+.column-card.focus {
+	border-left: 3px solid var(--accent);
+}
+
+.column-card.out-of-scope {
+	border-left: 3px solid var(--amber);
+}
+
+.column-card h4 {
+	margin: 0 0 1rem;
+	font-size: 1.05rem;
+	font-weight: 600;
+	color: #f0f2f8;
+}
+
+.column-card ul {
+	margin: 0;
+	padding-left: 1.25rem;
+}
+
+.column-card li {
+	margin-bottom: 0.5rem;
+	font-size: 0.85rem;
+	color: var(--text-muted);
+}
+
+.column-card li strong {
+	color: var(--text);
+}
