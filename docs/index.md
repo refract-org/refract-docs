@@ -1,4 +1,4 @@
-# Refract: deterministic ground truth for model evaluation
+# Refract: deterministic observation layer for model evaluation
 
 **Refract reveals how claims change across public revision histories — and gives AI researchers reproducible evidence for model evaluation.**
 
@@ -109,7 +109,7 @@ refract analyze "Earth" --report > earth-report.json
     <h3>Data Scientist / OSINT</h3>
     <p>Extract NDJSON events and run columnar SQL analysis in DuckDB.</p>
     <div class="usecase-steps">
-      <a href="tutorials/python-sdk/">Python SDK</a> ➔ <a href="analytics/">DuckDB</a> ➔ <a href="notebooks/">Notebooks</a>
+      <a href="tutorials/python-sdk/">Python SDK</a> ➔ <a href="python-sdk/">SDK Reference</a> ➔ <a href="notebooks/">Notebooks</a>
     </div>
   </div>
   <div class="usecase-card">
@@ -145,6 +145,18 @@ refract analyze "Earth" --report > earth-report.json
     </div>
   </div>
 </div>
+
+## Ecosystem
+
+Refract is one tool in a family of three:
+
+| Tool | What it does | Install |
+|------|-------------|---------|
+| **Refract** | CLI + TypeScript SDK — the deterministic observation engine | `npm install -g @refract-org/cli` |
+| **[Python SDK](python-sdk)** | Typed Python wrapper — pandas DataFrames, notebooks, LangChain | `pip install refract-py` |
+| **[Refract UI](visualizer)** | Browser visualizer — drag-and-drop JSONL, timelines, word-level diffs | `git clone refract-ui && bun run dev` |
+
+The natural workflow: **analyze** with Refract, **export** as NDJSON, then explore in Python or the UI.
 
 <p style="font-size: 0.875rem; color: var(--text-muted); margin-top: 1rem;">
   <strong>Other pathways:</strong> 

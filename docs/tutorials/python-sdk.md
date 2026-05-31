@@ -22,6 +22,8 @@ Or use `npx` — the SDK falls back to it automatically.
 
 ## Step 1: Analyze a page and get typed objects
 
+The SDK converts NDJSON `eventType` (camelCase) to pandas `event_type` (snake_case) for Python conventions. DataFrames use `event_type`, Python dataclasses use `eventType`.
+
 ```python
 from refract import Refract
 

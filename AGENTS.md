@@ -63,7 +63,7 @@ docs/
 - Reference the CLI as `refract` (`wikihistory` works as a backward-compat alias).
 - Use `refract` as the command name in all code examples.
 - Describe Refract as a deterministic observation engine.
-- L1/L2/L3 references are legacy — prefer "deterministic" / "ground truth".
+- L1/L2/L3 references are legacy — prefer "deterministic" / "observation layer".
 
 ## Build
 

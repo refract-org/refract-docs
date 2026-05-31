@@ -102,10 +102,12 @@ Model-assisted interpretation happens downstream — in NextConsensus, in consum
 
 ## What Refract does not do
 
-- No model interpretation — semantic analysis of what a change means is handled by downstream systems
+- No model calls in the deterministic pipeline — all analyzers are byte-reproducible without LLMs
 - No truth claims — Refract reports what changed, not whether the change is accurate
 - No prediction, sentiment analysis, or editor scoring
 - No claims about compliance, policy violations, or decision relevance
+
+Model-assisted classification is available at explicit BYO-inference boundaries (via `refract classify` or boundary config). When a model is used, the event records it — the deterministic pipeline itself never calls one.
 
 ## Independent ground truth
 

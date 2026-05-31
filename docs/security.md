@@ -4,6 +4,20 @@
 
 CLI flags containing credentials (`--api-key`, `--api-password`) are visible in process listings. Use environment variables instead:
 
+### MediaWiki auth (global `--api-key`)
+
+Used for authenticated API access to private wikis. Applies globally across `analyze`, `claim`, `export`, and `cron`:
+
+| CLI flag | Environment variable |
+|----------|---------------------|
+| `--api-key` | `REFRACT_MEDIAWIKI_API_KEY` |
+| `--api-user` | `REFRACT_MEDIAWIKI_API_USER` |
+| `--api-password` | `REFRACT_MEDIAWIKI_API_PASSWORD` |
+
+### Inference provider auth (`refract classify --api-key`)
+
+Used only for `refract classify` to call an LLM at a BYO-inference boundary:
+
 | CLI flag | Environment variable |
 |----------|---------------------|
 | `--api-key` | `REFRACT_INFERENCE_API_KEY` |

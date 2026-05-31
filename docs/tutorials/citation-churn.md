@@ -73,11 +73,11 @@ refract export "COVID-19" --format ndjson > covid-events.jsonl
 
 ```sql
 SELECT section,
-       count(*) FILTER (WHERE event_type = 'citation_added') as added,
-       count(*) FILTER (WHERE event_type = 'citation_removed') as removed,
-       count(*) FILTER (WHERE event_type = 'citation_replaced') as replaced
+       count(*) FILTER (WHERE "eventType" = 'citation_added') as added,
+       count(*) FILTER (WHERE "eventType" = 'citation_removed') as removed,
+       count(*) FILTER (WHERE "eventType" = 'citation_replaced') as replaced
 FROM 'covid-events.jsonl'
-WHERE event_type LIKE 'citation_%'
+WHERE "eventType" LIKE 'citation_%'
 GROUP BY section
 ORDER BY (added + removed + replaced) DESC
 LIMIT 5;

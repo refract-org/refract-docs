@@ -8,7 +8,7 @@
 
 **Deterministic observation engine** — Refract's core design: given the same revision range, the same events are always produced. No model, no randomness, no variance.
 
-**Downstream consumer** — A system that consumes Refract's event stream without modifying it to attach domain-specific interpretation. Examples include healthcare decision intelligence (NextConsensus), AI training data curation pipelines, provenance-aware RAG systems, regulatory/policy change monitors, competitive intelligence platforms, fact-checking tools, academic research on knowledge dynamics, journalism forensics tooling, and fan wiki canon tracking.
+**Downstream consumer** — A system that consumes Refract's event stream without modifying it, to attach domain-specific interpretation. Examples include healthcare claim review (NextConsensus), AI training data curation pipelines, provenance-aware RAG systems, regulatory/policy change monitors, competitive intelligence platforms, fact-checking tools, academic research on knowledge dynamics, journalism forensics tooling, and fan wiki canon tracking.
 
 **Edit cluster** — A group of 3+ edits within a configurable time window, detected by `detectEditClusters()`. High cluster activity signals concentrated contestation — the same claim being edited repeatedly by one or more editors. Window size and minimum group size are configurable via `AnalyzerConfig`.
 

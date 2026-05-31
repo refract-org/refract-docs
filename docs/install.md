@@ -4,6 +4,7 @@
 
 - **Node.js** 20+ or **Bun** v1.2+
 - **macOS** or **Linux** (Windows not yet supported)
+- **Bun required** for SQLite persistence (`--cache`). Analysis-only workflows work with Node.js.
 
 ## Zero install (recommended)
 

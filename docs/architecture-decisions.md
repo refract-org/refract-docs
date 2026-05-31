@@ -33,7 +33,7 @@ registry, no version negotiation overhead.
 require schema libraries and are not human-readable), CSV (loses nesting, can't
 represent arrays or nested objects), plain JSON array (must be fully loaded in memory).
 
-Parquet export is available via `--flatten` for analytical workloads.
+Parquet export is available via `--format parquet` for analytical workloads.
 
 ## SQLite for caching (via bun:sqlite)
 

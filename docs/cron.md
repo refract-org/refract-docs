@@ -183,9 +183,9 @@ jobs:
       - name: Compare with baseline
         run: |
           duckdb -c "
-            SELECT event_type, count(*) - (SELECT count(*) FROM 'baseline-events.jsonl' WHERE event_type = e.event_type) as delta
+            SELECT "eventType", count(*) - (SELECT count(*) FROM 'baseline-events.jsonl' WHERE "eventType" = e."eventType") as delta
             FROM 'pr-events.jsonl' e
-            GROUP BY event_type
+            GROUP BY "eventType"
             HAVING delta < 0
             ORDER BY delta;
           "
@@ -230,13 +230,13 @@ gh run download -n observation-latest
 
 # Compare with current observation
 duckdb -c "
-  SELECT e1.event_type,
+  SELECT e1."eventType",
          e1.cnt as previous,
          e2.cnt as current,
          e2.cnt - e1.cnt as delta
-  FROM (SELECT event_type, count(*) as cnt FROM 'observation-latest.jsonl' GROUP BY 1) e1
-  FULL OUTER JOIN (SELECT event_type, count(*) as cnt FROM 'observation-current.jsonl' GROUP BY 1) e2
-    ON e1.event_type = e2.event_type
+  FROM (SELECT "eventType", count(*) as cnt FROM 'observation-latest.jsonl' GROUP BY 1) e1
+  FULL OUTER JOIN (SELECT "eventType", count(*) as cnt FROM 'observation-current.jsonl' GROUP BY 1) e2
+    ON e1."eventType" = e2."eventType"
   ORDER BY abs(delta) DESC;
 "
 ```

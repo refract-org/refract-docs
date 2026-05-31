@@ -32,6 +32,8 @@
 		"children": [
 			{ "title": "Downstream Integration", "slug": "downstream" },
 			{ "title": "MCP / AI Agents", "slug": "mcp" },
+			{ "title": "Python SDK", "slug": "python-sdk" },
+			{ "title": "Refract UI", "slug": "visualizer" },
 			{ "title": "Analytics with DuckDB", "slug": "analytics" },
 			{ "title": "Notebooks", "slug": "notebooks" },
 			{ "title": "Cron Monitoring", "slug": "cron" }

@@ -55,7 +55,7 @@ Claude Code calls Refract's MCP tools to fetch the analysis, reads the structure
   "mcpServers": {
     "refract": {
       "command": "npx",
-      "args": ["refract", "mcp"]
+      "args": ["@refract-org/cli", "mcp"]
     }
   }
 }

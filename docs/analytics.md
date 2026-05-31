@@ -38,15 +38,15 @@ batch of records. No CREATE TABLE or INSERT step.
 ## Event type distribution
 
 ```sql
-SELECT event_type, count(*) as cnt
-FROM 'bitcoin-events.jsonl'
-GROUP BY event_type
+SELECT "eventType", count(*) as cnt
+FROM 'events.jsonl'
+GROUP BY "eventType"
 ORDER BY cnt DESC;
 ```
 
 Expected output for a typical Wikipedia page at `detailed` depth:
 
-| event_type | cnt |
+| "eventType" | cnt |
 |------------|-----|
 | sentence_modified | 85 |
 | citation_added | 34 |
@@ -59,11 +59,11 @@ Expected output for a typical Wikipedia page at `detailed` depth:
 
 ```sql
 SELECT strftime(timestamp, '%Y-%m') as month,
-       count(*) FILTER (WHERE event_type = 'citation_added') as added,
-       count(*) FILTER (WHERE event_type = 'citation_removed') as removed,
-       count(*) FILTER (WHERE event_type = 'citation_replaced') as replaced
+       count(*) FILTER (WHERE "eventType" = 'citation_added') as added,
+       count(*) FILTER (WHERE "eventType" = 'citation_removed') as removed,
+       count(*) FILTER (WHERE "eventType" = 'citation_replaced') as replaced
 FROM 'bitcoin-events.jsonl'
-WHERE event_type LIKE 'citation_%'
+WHERE "eventType" LIKE 'citation_%'
 GROUP BY month
 ORDER BY month;
 ```
@@ -78,9 +78,9 @@ Contested sections have both reverts and edit clusters:
 
 ```sql
 SELECT section,
-       count(*) FILTER (WHERE event_type = 'revert_detected') as reverts,
-       count(*) FILTER (WHERE event_type = 'edit_cluster_detected') as clusters,
-       count(*) FILTER (WHERE event_type LIKE 'sentence_%') as sentence_events,
+       count(*) FILTER (WHERE "eventType" = 'revert_detected') as reverts,
+       count(*) FILTER (WHERE "eventType" = 'edit_cluster_detected') as clusters,
+       count(*) FILTER (WHERE "eventType" LIKE 'sentence_%') as sentence_events,
        count(*) as total_events
 FROM 'bitcoin-events.jsonl'
 GROUP BY section
@@ -91,7 +91,7 @@ ORDER BY (reverts + clusters) DESC;
 ## Track a specific claim's lifecycle
 
 ```sql
-SELECT event_type, timestamp, section,
+SELECT "eventType", timestamp, section,
        before, after
 FROM 'bitcoin-events.jsonl'
 WHERE after LIKE '%decentralized%'
@@ -102,7 +102,7 @@ ORDER BY timestamp;
 ## Section-level timeline
 
 ```sql
-SELECT section, timestamp, event_type,
+SELECT section, timestamp, "eventType",
        count(*) OVER (PARTITION BY section ORDER BY to_revision_id)
          as cumulative_events
 FROM 'bitcoin-events.jsonl'
@@ -116,8 +116,8 @@ deliberation rather than edit-warring:
 
 ```sql
 SELECT strftime(timestamp, '%Y-%m-%d') as day,
-       count(*) FILTER (WHERE event_type LIKE 'talk_%') as talk_events,
-       count(*) FILTER (WHERE event_type = 'revert_detected') as reverts
+       count(*) FILTER (WHERE "eventType" LIKE 'talk_%') as talk_events,
+       count(*) FILTER (WHERE "eventType" = 'revert_detected') as reverts
 FROM 'bitcoin-events.jsonl'
 GROUP BY day
 HAVING talk_events > 0 OR reverts > 0
@@ -146,8 +146,8 @@ Then compare across pages:
 ```sql
 SELECT page_title,
        count(*) as events,
-       count(*) FILTER (WHERE event_type = 'revert_detected') as reverts,
-       count(*) FILTER (WHERE event_type LIKE 'citation_%') as citation_churn
+       count(*) FILTER (WHERE "eventType" = 'revert_detected') as reverts,
+       count(*) FILTER (WHERE "eventType" LIKE 'citation_%') as citation_churn
 FROM 'events.jsonl'
 GROUP BY page_title
 ORDER BY events DESC;
@@ -160,7 +160,7 @@ ORDER BY events DESC;
 duckdb -c "SELECT count(*) FROM 'events.jsonl'"
 
 # Verify event types are valid
-duckdb -c "SELECT DISTINCT event_type FROM 'events.jsonl' ORDER BY event_type"
+duckdb -c "SELECT DISTINCT \"eventType\" FROM 'events.jsonl' ORDER BY \"eventType\""
 
 # Check for empty sections
 duckdb -c "SELECT count(*) FROM 'events.jsonl' WHERE section = ''"

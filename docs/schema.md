@@ -56,7 +56,7 @@ optional at the envelope level:
 ```typescript
 export interface EvidenceEvent {
   eventId?: string;                              // deterministic content hash (see below)
-  eventType: EventType;                          // discriminator
+  eventType: EventType;                          // discriminator (serialized as "eventType" in NDJSON)
   claimId?: string;                              // claim identity hash, when applicable
   fromRevisionId: number;                        // parent revision
   toRevisionId: number;                          // source revision

@@ -49,7 +49,7 @@ For each model, find claims that first appeared after its training cutoff:
 -- GPT-4o cutoff: June 2024
 SELECT after as claim_text, timestamp, toRevisionId
 FROM 'events-GPT-4.jsonl'
-WHERE event_type = 'sentence_first_seen'
+WHERE "eventType" = 'sentence_first_seen'
   AND timestamp > '2024-06-01'
 ORDER BY timestamp;
 ```
@@ -65,19 +65,19 @@ revision ID, timestamp, SHA-256 hash.
 SELECT 'GPT-4o (cutoff Jun 2024)' as model,
   count(*) as claims_after_cutoff
 FROM 'events-GPT-4.jsonl'
-WHERE event_type = 'sentence_first_seen'
+WHERE "eventType" = 'sentence_first_seen'
   AND timestamp > '2024-06-01'
 UNION ALL
 SELECT 'Claude (cutoff Apr 2024)',
   count(*)
 FROM 'events-Claude_(language_model).jsonl'
-WHERE event_type = 'sentence_first_seen'
+WHERE "eventType" = 'sentence_first_seen'
   AND timestamp > '2024-04-01'
 UNION ALL
 SELECT 'Gemini (cutoff Nov 2023)',
   count(*)
 FROM 'events-Gemini_(language_model).jsonl'
-WHERE event_type = 'sentence_first_seen'
+WHERE "eventType" = 'sentence_first_seen'
   AND timestamp > '2023-11-01';
 ```
 
@@ -96,13 +96,13 @@ difference visible.
 ```sql
 SELECT
   after as claim_text,
-  count(*) FILTER (WHERE event_type = 'revert_detected') as reverts,
-  count(*) FILTER (WHERE event_type LIKE 'citation_%') as citation_churn,
-  count(*) FILTER (WHERE event_type LIKE 'talk_%') as talk_activity,
-  count(*) FILTER (WHERE event_type LIKE 'template_%') as template_disputes,
+  count(*) FILTER (WHERE "eventType" = 'revert_detected') as reverts,
+  count(*) FILTER (WHERE "eventType" LIKE 'citation_%') as citation_churn,
+  count(*) FILTER (WHERE "eventType" LIKE 'talk_%') as talk_activity,
+  count(*) FILTER (WHERE "eventType" LIKE 'template_%') as template_disputes,
   reverts + citation_churn + template_disputes as contestation_score
 FROM 'events.jsonl'
-WHERE event_type LIKE 'sentence_%'
+WHERE "eventType" LIKE 'sentence_%'
 GROUP BY after
 ORDER BY contestation_score DESC;
 ```
@@ -143,9 +143,9 @@ citation to a WHO report on that page in 2022?
 ### Check if a source ever existed
 
 ```sql
-SELECT timestamp, event_type, before, after
+SELECT timestamp, "eventType", before, after
 FROM 'events.jsonl'
-WHERE event_type IN ('citation_added', 'citation_removed', 'citation_replaced')
+WHERE "eventType" IN ('citation_added', 'citation_removed', 'citation_replaced')
   AND (after LIKE '%who.int%' OR before LIKE '%who.int%')
 ORDER BY timestamp;
 ```

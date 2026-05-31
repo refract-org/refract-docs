@@ -39,13 +39,13 @@ SELECT
   after as claim_text,
   min(timestamp) as first_seen,
   max(timestamp) as last_seen,
-  count(*) FILTER (WHERE event_type = 'revert_detected') as revert_count,
-  count(*) FILTER (WHERE event_type LIKE 'citation_%') as citation_churn,
-  count(*) FILTER (WHERE event_type LIKE 'talk_%') as talk_activity,
-  count(*) FILTER (WHERE event_type LIKE 'template_%') as template_disputes,
-  count(*) FILTER (WHERE event_type = 'edit_cluster_detected') as edit_clusters
+  count(*) FILTER (WHERE "eventType" = 'revert_detected') as revert_count,
+  count(*) FILTER (WHERE "eventType" LIKE 'citation_%') as citation_churn,
+  count(*) FILTER (WHERE "eventType" LIKE 'talk_%') as talk_activity,
+  count(*) FILTER (WHERE "eventType" LIKE 'template_%') as template_disputes,
+  count(*) FILTER (WHERE "eventType" = 'edit_cluster_detected') as edit_clusters
 FROM 'covid-events.jsonl'
-WHERE event_type LIKE 'sentence_%'
+WHERE "eventType" LIKE 'sentence_%'
   AND claim_id IS NOT NULL
 GROUP BY claim_id, after
 ORDER BY revert_count DESC, citation_churn DESC;
@@ -85,8 +85,8 @@ stability = con.execute("""
   SELECT
     claim_id,
     after as claim_text,
-    max(CASE WHEN event_type = 'revert_detected' THEN 1 ELSE 0 END) as was_reverted,
-    count(*) FILTER (WHERE event_type LIKE 'citation_%') as citation_churn
+    max(CASE WHEN "eventType" = 'revert_detected' THEN 1 ELSE 0 END) as was_reverted,
+    count(*) FILTER (WHERE "eventType" LIKE 'citation_%') as citation_churn
   FROM events
   WHERE claim_id IS NOT NULL
   GROUP BY claim_id, after

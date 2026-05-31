@@ -90,7 +90,7 @@ Refract's event stream is purely mechanical. All interpretation happens downstre
 
 | Consumer | Builds on Refract |
 |----------|-------------------|
-| **Healthcare decision intelligence** | Feed structured events into a measurement pipeline that scores claims by clinical truth, ratification, economic stake, and feasibility. Each event carries the exact analyzer thresholds used. |
+| **Healthcare claim review** | Feed structured events into a review pipeline that checks whether a claim still holds up against the current evidence. Each event carries the exact analyzer thresholds used. |
 | **AI training data curation** | Score each claim by revert count, citation churn, talk page correlation, and template dispute history. Include only stable, well-sourced claims in training data. |
 | **Provenance-aware RAG** | Enrich each retrieved chunk with its claim history — stable, recently changed, source-fragile, contested. Use the signal to weight or filter results. |
 | **Regulatory monitoring** | Run `refract cron` on drug pages, guidelines, and regulatory topics. Alert on citation removal, template disputes, or section reorganization. |
@@ -112,7 +112,7 @@ Refract pairs naturally with these modern tools. The event stream is standard JS
 | **AI coding agents** | Claude Code, Cline, Codex CLI, OpenClaw | Agents connect via Refract's built-in MCP server (`refract mcp`) to read claim histories, track changes, and cite provenance in their reasoning. |
 | **Python SDK** | `refract-py` ([GitHub](https://github.com/refract-org/refract-py)) | Typed dataclasses, pandas DataFrame integration, `RefractError` handling. Install: `pip install refract-py` (requires `npm install -g @refract-org/cli`). |
 | **MCP (Model Context Protocol)** | Any MCP client (Claude Desktop, VS Code, Cursor, ChatGPT) | `refract mcp` is a native MCP server exposing tools for analyze, claim, export, cron, and classify. AI agents use these tools to retrieve claim history directly. |
-| **Data lakes & query** | DuckDB, Apache Parquet, ClickHouse | Query `refract export --format ndjson` output with SQL. DuckDB can query JSONL files directly: `SELECT event_type, count(*) FROM 'events.jsonl' GROUP BY event_type;` |
+| **Data lakes & query** | DuckDB, Apache Parquet, ClickHouse | Query `refract export --format ndjson` output with SQL. DuckDB can query JSONL files directly: `SELECT "eventType", count(*) FROM 'events.jsonl' GROUP BY "eventType";` |
 | **Streaming** | Apache Kafka, Redpanda, Cloudflare Queues | Feed event streams into real-time claim monitoring pipelines. Each `EvidenceEvent` is a Kafka message with key by claimId for stateful processing. |
 | **Visualization** | Observable Framework, Mermaid, D3 | `refract visualize --format mermaid` produces Mermaid diagrams. Observable Framework has a [data loader recipe](./sdk.md#observable-framework-data-loader). D3 reads event JSONL directly. |
 | **Knowledge graphs** | RDF, SPARQL, Neo4j | Convert `wikilink_added`/`category_added` events into triple statements. Build an evolving entity graph where each edge has a revision timestamp. |
@@ -128,7 +128,7 @@ When consuming Refract events in a production pipeline, persist them to a querya
 ```sql
 CREATE TABLE refract_events (
     event_id TEXT PRIMARY KEY,
-    event_type TEXT NOT NULL,
+    "eventType" TEXT NOT NULL,
     schema_version TEXT NOT NULL,
     from_revision_id INTEGER NOT NULL,
     to_revision_id INTEGER NOT NULL,
@@ -147,7 +147,7 @@ CREATE TABLE refract_events (
 );
 
 CREATE INDEX idx_refract_events_batch ON refract_events(batch_id);
-CREATE INDEX idx_refract_events_type ON refract_events(event_type);
+CREATE INDEX idx_refract_events_type ON refract_events("eventType");
 CREATE INDEX idx_refract_events_page ON refract_events(page_title);
 CREATE INDEX idx_refract_events_observed ON refract_events(observed_at);
 ```

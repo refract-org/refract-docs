@@ -13,10 +13,10 @@ stability — all using deterministic, byte-reproducible output.
 ## Step 1: Zero-install analysis
 
 ```bash
-npx @refract-org/cli analyze "Bitcoin" --depth detailed
+npx @refract-org/cli analyze "Bitcoin" --depth forensic
 ```
 
-This fetches 20 recent revisions and runs all standard deterministic analyzers.
+This fetches 20 recent revisions and runs all 26 deterministic analyzers, including wikilink and category diffing, talk page correlation, and edit cluster detection.
 Output is one JSON event per line — the full event stream:
 
 ```
@@ -82,9 +82,9 @@ Now we have a portable, queryable file of the complete event stream.
 
 ```bash
 duckdb -c "
-SELECT event_type, count(*) as cnt
+SELECT "eventType", count(*) as cnt
 FROM 'bitcoin-events.jsonl'
-GROUP BY event_type
+GROUP BY "eventType"
 ORDER BY cnt DESC;
 "
 ```
@@ -107,8 +107,8 @@ Find the most contested section:
 
 ```sql
 SELECT section,
-       count(*) FILTER (WHERE event_type = 'revert_detected') as reverts,
-       count(*) FILTER (WHERE event_type = 'edit_cluster_detected') as clusters
+       count(*) FILTER (WHERE "eventType" = 'revert_detected') as reverts,
+       count(*) FILTER (WHERE "eventType" = 'edit_cluster_detected') as clusters
 FROM 'bitcoin-events.jsonl'
 GROUP BY section
 HAVING reverts > 0 OR clusters > 0

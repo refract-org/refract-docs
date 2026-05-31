@@ -15,7 +15,7 @@ get from Wikipedia's built-in tools vs. what Refract adds.
 | **Detect edit wars** | Manual — look for back-and-forth in history | `revert_detected` + `edit_cluster_detected` — automatic structural detection |
 | **Correlate article edits with talk page discussion** | Manual — check Talk tab separately | `talk_page_correlated` — Refract checks 7 days before / 3 days after each edit |
 | **Compare the same topic across language editions** | Manual — open each wiki separately | `refract diff` — cross-wiki comparison with z-score outlier detection |
-| **Query with SQL** | No | DuckDB: `SELECT event_type, count(*) FROM 'events.jsonl' GROUP BY 1` |
+| **Query with SQL** | No | DuckDB: `SELECT "eventType", count(*) FROM 'events.jsonl' GROUP BY 1` |
 | **Cryptographic audit trail** | No — screenshots are the only proof | `refract export --bundle` → Merkle root, reproducible by anyone |
 | **Automated monitoring** | No — you check manually | `refract cron` + `refract watch` → Slack, email, webhook alerts |
 | **AI agent integration** | No | `refract mcp` → Claude Code, Cursor, VS Code can call Refract tools directly |

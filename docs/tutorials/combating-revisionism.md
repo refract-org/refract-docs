@@ -57,7 +57,7 @@ refract analyze "Battle of X" --depth forensic -c > battle-events.jsonl
 ```sql
 SELECT timestamp, before, after
 FROM 'battle-events.jsonl'
-WHERE event_type = 'citation_replaced'
+WHERE "eventType" = 'citation_replaced'
   AND section LIKE '%Casualties%'
 ORDER BY timestamp;
 ```
@@ -71,9 +71,9 @@ To find claims that lost their original sources:
 ```sql
 SELECT
   claim_id,
-  count(*) FILTER (WHERE event_type = 'citation_added') as sources_added,
-  count(*) FILTER (WHERE event_type = 'citation_removed') as sources_removed,
-  count(*) FILTER (WHERE event_type = 'citation_replaced') as sources_swapped
+  count(*) FILTER (WHERE "eventType" = 'citation_added') as sources_added,
+  count(*) FILTER (WHERE "eventType" = 'citation_removed') as sources_removed,
+  count(*) FILTER (WHERE "eventType" = 'citation_replaced') as sources_swapped
 FROM 'battle-events.jsonl'
 GROUP BY claim_id
 HAVING sources_removed > sources_added
@@ -87,7 +87,7 @@ ORDER BY sources_swapped DESC;
 ```sql
 SELECT timestamp, section, deterministicFacts[0].detail as detail
 FROM 'battle-events.jsonl'
-WHERE event_type = 'edit_cluster_detected'
+WHERE "eventType" = 'edit_cluster_detected'
 ORDER BY timestamp;
 ```
 
@@ -102,9 +102,9 @@ is itself a signal:
 
 ```sql
 SELECT
-  count(*) FILTER (WHERE event_type LIKE 'sentence_%') as content_changes,
-  count(*) FILTER (WHERE event_type LIKE 'talk_%') as talk_activity,
-  count(*) FILTER (WHERE event_type = 'revert_detected') as reverts
+  count(*) FILTER (WHERE "eventType" LIKE 'sentence_%') as content_changes,
+  count(*) FILTER (WHERE "eventType" LIKE 'talk_%') as talk_activity,
+  count(*) FILTER (WHERE "eventType" = 'revert_detected') as reverts
 FROM 'battle-events.jsonl';
 ```
 

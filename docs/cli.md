@@ -90,6 +90,7 @@ refract cron <pages-file> [options]
 | `--notify-slack` | off | Send Slack notification on changes |
 | `--notify-email` | off | Send email notification on changes |
 | `--notify-webhook <u>` | — | Send generic webhook POST on changes |
+| `--export <dir>` | — | Export each observation to timestamped files |
 | `--api <url>` | `en.wikipedia.org` | MediaWiki API base URL |
 
 ## `refract diff`
