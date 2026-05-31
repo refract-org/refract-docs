@@ -1,6 +1,6 @@
 # Event taxonomy
 
-Each Refract event describes what changed at a revision boundary. Events are deterministic — the same input always produces the same output.
+Each Refract event describes what changed at a revision boundary. Events are deterministic — the same input always produces the same output. Events chain into claim-state timelines across revisions — see [Temporal Model](./temporal-model.md) for how events form replayable history.
 
 ## Claim lifecycle
 
