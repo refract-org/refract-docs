@@ -144,7 +144,7 @@ Key exports:
 
 ### `@refract-org/cli`
 
-The `refract` / `wikihistory` CLI tool (10 commands: analyze, claim, cron, diff, eval, explore, export, mcp, visualize, watch). See [CLI reference](./cli).
+The `refract` / `wikihistory` CLI tool (14 commands: analyze, claim, classify, cron, diff, eval, explore, export, init, mcp, snapshot, stream, visualize, watch). See [CLI reference](./cli).
 
 ### `@refract-org/persistence`
 
