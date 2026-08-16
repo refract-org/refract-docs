@@ -23,10 +23,10 @@
 		"assets:generate": "bun run scripts/generate-scenes.ts"
 	},
 	"devDependencies": {
-		"@biomejs/biome": "^2.4.15",
+		"@biomejs/biome": "^2.5.8",
 		"husky": "^9.1.7",
 		"lint-staged": "^17.0.5",
 		"marked": "^15.0.0",
-		"vitest": "^4.1.7"
+		"vitest": "^4.1.10"
 	}
 }
