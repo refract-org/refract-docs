@@ -23,7 +23,7 @@ The server starts and waits for MCP client connections on stdio. Connect any MCP
   "mcpServers": {
     "refract": {
       "command": "npx",
-      "args": ["@refract-org/cli", "mcp"]
+      "args": ["@refract-org/mcp", "mcp"]
     }
   }
 }
@@ -42,7 +42,7 @@ Claude Code calls Refract's MCP tools to fetch the analysis, reads the structure
   "mcpServers": {
     "refract": {
       "command": "npx",
-      "args": ["@refract-org/cli", "mcp"]
+      "args": ["@refract-org/mcp", "mcp"]
     }
   }
 }
@@ -55,7 +55,7 @@ Claude Code calls Refract's MCP tools to fetch the analysis, reads the structure
   "mcpServers": {
     "refract": {
       "command": "npx",
-      "args": ["@refract-org/cli", "mcp"]
+      "args": ["@refract-org/mcp", "mcp"]
     }
   }
 }
