@@ -1,4 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 840 520" width="840" height="520">
+  <title>Refract explorer interface</title>
   <defs>
     <filter id="shadow" x="-5%" y="-2%" width="110%" height="110%">
       <feDropShadow dx="0" dy="1" stdDeviation="2" flood-color="#000" flood-opacity="0.08"/>
@@ -74,7 +75,7 @@
 
   <rect x="52" y="297" width="736" height="32" rx="4" fill="#f5f3ff" stroke="#c4b5fd" stroke-width="0.5"/>
   <text x="64" y="317" class="event-type" fill="#6d28d9">template_added</text>
-  <text x="200" y="317" class="event-detail">{{citations needed}}</text>
+  <text x="200" y="317" class="event-detail">&#123;&#123;citations needed&#125;&#125;</text>
   <text x="640" y="317" class="ui-label">2010-02-22 · rev 315000000</text>
   <text x="760" y="317" class="badge" fill="#7c3aed">▸tmpl</text>
 

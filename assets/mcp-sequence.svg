@@ -1,4 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 620" width="720" height="620">
+  <title>Refract MCP protocol sequence</title>
   <defs>
     <marker id="arrowReq" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="6" markerHeight="6" orient="auto">
       <path d="M 10 0 L 0 5 L 10 10 z" fill="#3b82f6"/>

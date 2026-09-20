@@ -1,4 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 840 440" width="840" height="440">
+  <title>Evidence labels</title>
   <defs>
     <filter id="shadow" x="-2%" y="-5%" width="104%" height="120%">
       <feDropShadow dx="0" dy="1" stdDeviation="2" flood-color="#000" flood-opacity="0.06"/>

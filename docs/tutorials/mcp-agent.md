@@ -30,7 +30,7 @@ Add to your Claude Code MCP config:
   "mcpServers": {
     "refract": {
       "command": "npx",
-      "args": ["@refract-org/cli", "mcp"]
+      "args": ["@refract-org/mcp", "mcp"]
     }
   }
 }
@@ -43,7 +43,7 @@ Add to your Claude Code MCP config:
   "mcpServers": {
     "refract": {
       "command": "npx",
-      "args": ["@refract-org/cli", "mcp"]
+      "args": ["@refract-org/mcp", "mcp"]
     }
   }
 }
@@ -56,7 +56,7 @@ Add to your Claude Code MCP config:
   "mcpServers": {
     "refract": {
       "command": "npx",
-      "args": ["refract", "mcp"]
+      "args": ["@refract-org/mcp", "mcp"]
     }
   }
 }
