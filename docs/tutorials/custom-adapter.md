@@ -30,13 +30,19 @@ Once you have `Revision[]`, every analyzer works: section differ, citation track
 revert detector, edit cluster detector, talk page correlator. The analyzers are
 pure functions — they don't know or care where the revisions came from.
 
+They do care what the content is written in. The section, citation, template and
+link diffs parse wikitext: `== headings ==`, `<ref>` tags, `{{templates}}`,
+`[[links]]`. Content in another markup has to be converted to wikitext first, or
+those diffs find nothing to compare. Confluence's storage format, used below, is
+XHTML.
+
 ## Pattern: adapter function
 
 Write a single function that fetches your source and returns `Revision[]`:
 
 ```typescript
 import type { Revision } from "@refract-org/evidence-graph";
-import { sectionDiffer, citationTracker } from "@refract-org/analyzers";
+import { annotateEvents, buildRevisionEvents } from "@refract-org/analyzers";
 
 async function fetchFromConfluence(
   pageId: string,
@@ -55,7 +61,7 @@ async function fetchFromConfluence(
     timestamp: v.when,
     user: v.by?.displayName,
     comment: v.message ?? "",
-    content: v.body?.storage?.value ?? "",
+    content: toWikitext(v.body?.storage?.value ?? ""), // your XHTML-to-wikitext converter
     size: v.body?.storage?.value?.length ?? 0,
     minor: v.minorEdit ?? false,
   }));
@@ -63,22 +69,9 @@ async function fetchFromConfluence(
 
 // Use it exactly like the Wikipedia client
 const revisions = await fetchFromConfluence("12345", "https://mycompany.atlassian.net/wiki", "token");
-const events = [];
-
-for (let i = 1; i < revisions.length; i++) {
-  events.push(
-    ...sectionDiffer.diffSections(
-      sectionDiffer.extractSections(revisions[i - 1].content),
-      sectionDiffer.extractSections(revisions[i].content),
-    ),
-  );
-  events.push(
-    ...citationTracker.diffCitations(
-      citationTracker.extractCitations(revisions[i - 1].content),
-      citationTracker.extractCitations(revisions[i].content),
-    ),
-  );
-}
+// The events `refract analyze` derives from each pair of revisions
+// (@refract-org/analyzers 0.5.1+, the next release).
+const events = annotateEvents(buildRevisionEvents(revisions));
 
 console.log(`Found ${events.length} events across ${revisions.length} revisions`);
 ```

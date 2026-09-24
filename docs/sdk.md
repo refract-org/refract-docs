@@ -10,42 +10,23 @@ Packages are published on npm under the `@refract-org` scope. All packages are E
 
 ## Basic pipeline
 
+The events `refract analyze` produces, from revisions you fetch yourself. `buildRevisionEvents` and `annotateEvents` arrive in `@refract-org/analyzers` 0.5.1, the next release; npm has 0.5.0, so until then build from source (see [installation](./install)).
+
 ```typescript
 import { MediaWikiClient } from "@refract-org/ingestion";
-import {
-  sectionDiffer,
-  citationTracker,
-  computeCertaintyProfile,
-  computeDirectionSignal,
-  extractQuantitativeFindings,
-} from "@refract-org/analyzers";
-import type { EvidenceEvent } from "@refract-org/evidence-graph";
+import { annotateEvents, buildRevisionEvents } from "@refract-org/analyzers";
+import { createEventIdentity } from "@refract-org/evidence-graph";
 
 const client = new MediaWikiClient({ apiUrl: "https://en.wikipedia.org/w/api.php" });
-const revisions = await client.fetchRevisions("Earth");
+const revisions = await client.fetchRevisions("Earth", { limit: 50 }); // the 50 latest
 
-const events: EvidenceEvent[] = [];
-for (let i = 1; i < revisions.length; i++) {
-  const before = revisions[i - 1].content;
-  const after = revisions[i].content;
-
-  // Deterministic structural diffs
-  events.push(...sectionDiffer.diffSections(
-    sectionDiffer.extractSections(before),
-    sectionDiffer.extractSections(after),
-  ));
-  events.push(...citationTracker.diffCitations(
-    citationTracker.extractCitations(before),
-    citationTracker.extractCitations(after),
-  ));
-
-  // Deterministic semantic enrichment (v0.5.0+)
-  const beforeProfile = computeCertaintyProfile(before);
-  const afterProfile = computeCertaintyProfile(after);
-  const direction = computeDirectionSignal(beforeProfile, afterProfile);
-  const findings = extractQuantitativeFindings(after);
-}
+// Section, citation, wikilink, category, template, revert and sentence events
+// for each consecutive pair of revisions, ordered by timestamp.
+const events = annotateEvents(buildRevisionEvents(revisions));
+for (const event of events) event.eventId = createEventIdentity(event);
 ```
+
+`annotateEvents` adds `schemaVersion` and the semantic fields the CLI's output carries (`certaintyProfile`, `directionSignal`, `quantitativeFindings` and others). `buildRevisionEvents` takes `depth` (`"brief"`, `"detailed"`, `"forensic"`), `similarityThreshold` and the page's `protectionLogs`. It reads no network and no filesystem, so it runs in a Worker too (with `nodejs_compat`). For page moves and talk-page correlation as well, follow the recipe in the [analyzers README](https://github.com/refract-org/refract/tree/main/packages/analyzers#event-pipeline-051).
 
 ## Storage
 
@@ -116,7 +97,7 @@ import { sectionDiffer, citationTracker, revertDetector, templateTracker } from 
 import type { SectionDiffer, CitationTracker, RevertDetector, TemplateTracker } from "@refract-org/analyzers";
 ```
 
-All analyzers share a common pattern — extract from wikitext, diff across revisions, produce `EvidenceEvent` arrays. Every analyzer accepts an optional `AnalyzerConfig` — thresholds, patterns, and windows that can be tuned per domain. The effective config is recorded in each event's `FactProvenance.parameters` when non-default values are used.
+All analyzers share a common pattern: extract from wikitext, then diff two extractions. The diffs are change records (`SectionChange`, `CitationChange`, `TemplateChange`), not events; `buildRevisionEvents` (0.5.1+) turns a revision history into `EvidenceEvent`s. Every analyzer accepts an optional `AnalyzerConfig` — thresholds, patterns, and windows that can be tuned per domain. The effective config is recorded in each event's `FactProvenance.parameters` when non-default values are used.
 
 ```typescript
 import { sectionDiffer, citationTracker, revertDetector, templateTracker, detectEditClusters } from "@refract-org/analyzers";
@@ -134,10 +115,11 @@ const changes = sectionDiffer.diffSections(before, after, config.section);
 ```
 
 Key exports:
+- **Event pipeline** (0.5.1+): `buildRevisionEvents`, `annotateEvents`, and the per-pair steps `parseContent`, `computeStructuralDiffs`, `detectEditorialSignals`
 - Instances: `sectionDiffer`, `citationTracker`, `revertDetector`, `templateTracker`, `protectionTracker`
 - Builders: `buildSectionLineage`, `buildSourceLineage`, `buildClaimLineage`, `buildWikilinkEvents`, `buildPageMoveEvents`, `buildTalkThreadEvents`, `buildCategoryEvents`, `buildParamChangeEvents`
 - Classifiers: `classifyHeuristic`
-- Parsers: `sanitizeWikitext`, `extractHeadingMap`, `extractWikilinks`, `extractCategories`, `countCitations`, `countKeywordMentions`, `deriveSectionHeading`
+- Parsers: `sanitizeWikitext`, `extractHeadingMap`, `extractWikilinks`, `extractCategories`, `countCitations`, `countKeywordMentions`, `deriveSectionHeading`, `findSectionForText` and `buildSectionCharMap` (0.5.1+)
 - Cross-revision: `correlateTalkRevisions`, `diffObservations`, `parseTalkThreads`, `diffTalkThreads`, `diffTemplateParams`, `diffCategories`, `diffWikilinks`
 - Clusters & activity: `detectEditClusters`, `detectTalkActivitySpikes`
 - **Semantic enrichment** (v0.5.0+): `computeCertaintyProfile`, `computeDirectionSignal`, `computeEditMagnitude`, `computeContentChange`, `extractKeyTerms`, `extractQuantitativeFindings`

@@ -14,31 +14,34 @@ refract export "Bitcoin" --format ndjson > bitcoin-events.jsonl
 refract analyze "Bitcoin" --report > bitcoin-report.json
 ```
 
-Each event carries `schemaVersion`, `FactProvenance` (analyzer, version, parameters), and an `eventId` (deterministic content hash).
+Each event carries `schemaVersion` and an `eventId`, a deterministic hash of the event's type, revisions, section, text, timestamp and facts.
 
-### 2. SDK events via adapter
+### 2. SDK events from your own revisions
 
 ```typescript
-import { buildStructuredEvents, EVENT_SCHEMA_VERSION } from "@refract-org/evidence-graph";
-import { sectionDiffer, citationTracker, detectEditClusters } from "@refract-org/analyzers";
+import { annotateEvents, buildRevisionEvents } from "@refract-org/analyzers";
+import { createEventIdentity } from "@refract-org/evidence-graph";
 
-const events = buildStructuredEvents(revisions);
-// Each event has schemaVersion, FactProvenance with version, parameters
+const events = annotateEvents(buildRevisionEvents(revisions));
+for (const event of events) event.eventId = createEventIdentity(event);
 ```
+
+These are the events the CLI derives from each pair of revisions, from the same code: the CLI calls `buildRevisionEvents` too. Both functions arrive in `@refract-org/analyzers` 0.5.1, the next release. Before it, a consumer had to copy the CLI's diff code, and a copy drifts: import the export rather than keeping one. See the [SDK reference](sdk.md#basic-pipeline).
 
 ### 3. FactProvenance for auditability
 
-Every event's `deterministicFacts[0].provenance` includes:
+`FactProvenance` in `@refract-org/evidence-graph` is the shape for recording which analyzer, at which version and with which parameters, produced a fact:
 
 ```json
 {
   "analyzer": "section-differ",
-  "version": "0.4.0",
+  "version": "0.5.1",
+  "inputHashes": [],
   "parameters": { "similarityThreshold": 0.8 }
 }
 ```
 
-When a consumer overrides a threshold, the effective value is in `parameters`.
+Refract's own events do not fill it in: their facts carry `fact` and `detail`. A consumer that needs per-fact provenance records it when it stores the events, taking the version from the installed `@refract-org/analyzers` and the parameters from the options it passed.
 
 ### 4. Schema versioning
 
@@ -90,7 +93,7 @@ Refract's event stream is purely mechanical. All interpretation happens downstre
 
 | Consumer | Builds on Refract |
 |----------|-------------------|
-| **Healthcare claim review** | Feed structured events into a review pipeline that checks whether a claim still holds up against the current evidence. Each event carries the exact analyzer thresholds used. |
+| **Healthcare claim review** | Feed structured events into a review pipeline that checks whether a claim still holds up against the current evidence. Store the analyzer version and thresholds with each event, since the events do not carry them. |
 | **AI training data curation** | Score each claim by revert count, citation churn, talk page correlation, and template dispute history. Include only stable, well-sourced claims in training data. |
 | **Provenance-aware RAG** | Enrich each retrieved chunk with its claim history — stable, recently changed, source-fragile, contested. Use the signal to weight or filter results. |
 | **Regulatory monitoring** | Run `refract cron` on drug pages, guidelines, and regulatory topics. Alert on citation removal, template disputes, or section reorganization. |
@@ -162,7 +165,7 @@ export type { EvidenceEvent, FactProvenance, AnalyzerConfig } from '@refract-org
 export { EVENT_SCHEMA_VERSION, DEFAULT_ANALYZER_CONFIG, createEventIdentity } from '@refract-org/evidence-graph';
 export { sectionDiffer, citationTracker, revertDetector, detectEditClusters } from '@refract-org/analyzers';
 export { computeCertaintyProfile, computeDirectionSignal, extractQuantitativeFindings } from '@refract-org/analyzers';
-export { buildStructuredEvents } from '../adapter/build-events';
+export { annotateEvents, buildRevisionEvents } from '@refract-org/analyzers'; // 0.5.1+
 
 // repository.ts — D1 insert
 export async function insertRefractEvents(
