@@ -110,7 +110,7 @@ Refract pairs naturally with these modern tools. The event stream is standard JS
 | **Vector databases** | Pinecone, Weaviate, pgvector, Chroma | Store claim embeddings alongside stability metadata. Query: "find claims similar to X that are stable and well-sourced." |
 | **RAG frameworks** | LangChain, LlamaIndex, Vercel AI SDK | Use Refract's stability/contestation signals as retrieval filters or reranking features. A [LangChain document loader](https://github.com/refract-org/refract-py/blob/main/src/refract_langchain.py) is available in the `refract-py` package. |
 | **AI coding agents** | Claude Code, Cline, Codex CLI, OpenClaw | Agents connect via Refract's built-in MCP server (`refract mcp`) to read claim histories, track changes, and cite provenance in their reasoning. |
-| **Python SDK** | `refract-py` ([GitHub](https://github.com/refract-org/refract-py)) | Typed dataclasses, pandas DataFrame integration, `RefractError` handling. Install: `pip install refract-py` (requires `npm install -g @refract-org/cli`). |
+| **Python SDK** | `refract-py` ([GitHub](https://github.com/refract-org/refract-py)) | Typed dataclasses, pandas DataFrame integration, `RefractError` handling. Install: `pip install git+https://github.com/refract-org/refract-py.git` (not on PyPI; needs the Refract CLI on `PATH`). |
 | **MCP (Model Context Protocol)** | Any MCP client (Claude Desktop, VS Code, Cursor, ChatGPT) | `refract mcp` is a native MCP server exposing tools for analyze, claim, export, cron, and classify. AI agents use these tools to retrieve claim history directly. |
 | **Data lakes & query** | DuckDB, Apache Parquet, ClickHouse | Query `refract export --format ndjson` output with SQL. DuckDB can query JSONL files directly: `SELECT "eventType", count(*) FROM 'events.jsonl' GROUP BY "eventType";` |
 | **Streaming** | Apache Kafka, Redpanda, Cloudflare Queues | Feed event streams into real-time claim monitoring pipelines. Each `EvidenceEvent` is a Kafka message with key by claimId for stateful processing. |
@@ -119,7 +119,7 @@ Refract pairs naturally with these modern tools. The event stream is standard JS
 | **Model serving** | OpenAI API, DeepSeek, Ollama, vLLM, Workers AI | Plug any OpenAI-compatible endpoint into `refract classify` at each BYO-inference boundary. Workers AI runs models at the edge without managing servers. |
 | **Local inference** | WebGPU, MLX, llama.cpp | Run detection models directly on-device — no API key needed. Refract defaults are mechanical (zero inference), but any boundary can be replaced with a local model via MCP sampling or Ollama. |
 | **Notebooks** | Jupyter, Marimo, Observable notebooks | Load event JSONL into a DataFrame: `pd.read_json("events.jsonl", lines=True)`. Analyze claim stability, citation churn, and edit cluster patterns interactively. Marimo's reactive runtime is particularly well-suited for live event stream analysis. |
-| **Serverless** | Cloudflare Workers, D1, R2, Queues | Run `refract` via `npx` in a Worker, store structured events in D1, export to R2, queue re-observations. The entire infrastructure is edge-deployable with no servers to manage. |
+| **Serverless** | Cloudflare Workers, D1, R2, Queues | Import the library packages in a Worker (`nodejs_compat`; they use `node:crypto`) to fetch and diff revisions at the edge, store events in D1, export to R2, queue re-observations. The CLI needs Node or Bun and a filesystem, so it runs on a scheduled runner, not in a Worker — see [cron](cron.md#serverless-platforms). |
 
 ## Production ingestion
 
