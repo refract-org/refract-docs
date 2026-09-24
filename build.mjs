@@ -128,11 +128,8 @@ function wrapHTML(title, content, currentSlug, headings = []) {
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>${title} — Refract</title>
   <link rel="stylesheet" href="${BASE}style.css?v=${ASSET_VERSION}">
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>◈</text></svg>">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><style>path{fill:%2307090f}@media (prefers-color-scheme:dark){path{fill:%23e2e4ed}}</style><path d='M8 2 15 14H1z'/></svg>">
   <meta name="description" content="Refract — the open claim-history layer for public knowledge. Deterministic event stream of claims, sources, and disputes across revision histories.">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Manrope:wght@300;400;500;600;700&family=Recursive:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
   <div id="progress" aria-hidden="true"></div>
@@ -275,7 +272,7 @@ function wrapHTML(title, content, currentSlug, headings = []) {
         try {
           await navigator.clipboard.writeText(code.innerText);
           btn.classList.add('copied');
-          btn.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg><span>Copied!</span>';
+          btn.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg><span>Copied</span>';
           setTimeout(() => {
             btn.classList.remove('copied');
             btn.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg><span>Copy</span>';
