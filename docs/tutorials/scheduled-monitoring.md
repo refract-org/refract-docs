@@ -11,7 +11,7 @@ and section reorganization as they happen — not when someone notices.
 | Mode | How it works | Use when |
 |---|---|---|
 | `refract cron` | One-shot re-observation for cron scheduling | Batch monitoring of many pages on a fixed schedule |
-| `refract watch` | Live polling daemon for a single page/section | Real-time monitoring of a specific page |
+| `refract watch` | Polls one page and prints its new revisions until stopped | Following a specific page as it changes |
 
 ## Step 1: Create your pages file
 
@@ -32,52 +32,39 @@ Pages can be any valid MediaWiki page title. Use underscores for spaces.
 ## Step 2: Run a one-shot re-observation
 
 ```bash
-refract cron watch-pages.txt --interval 24
+refract cron watch-pages.txt --interval 24 --cache-dir ~/.refract-watch
 ```
 
-This re-observes every page in the file, fetching revisions from the last 24 hours
-(since the last observation). Pages with no new revisions are skipped. Pages with new
-revisions are analyzed and events are emitted.
+This re-observes every page in the file over the last 24 hours and prints, per page,
+how many events are new since the previous run. The first run for a page records a
+baseline and reports none. `--cache-dir` is where `cron` keeps each page's previous
+observation; without it, `~/.wikihistory`. The [cron reference](../cron.md) describes
+the comparison, the output and the exit code.
 
-Use `-c` to cache revisions and avoid re-fetching:
+> `refract cron` reports new events from the next CLI release onward: up to 0.5.7 it
+> compared each run against itself and reported zero. npm's 0.5.7 does not start at
+> all — [build from source](../install.md#from-source) until the release is out.
+
+## Step 3: Schedule it
+
+Add to your crontab, with the interval matching the schedule:
 
 ```bash
-refract cron watch-pages.txt --interval 24 -c
+# Every 6 hours
+0 */6 * * * refract cron /path/to/watch-pages.txt --interval 6 --cache-dir /path/to/state
 ```
 
-The cache stores revision content in `~/.wikihistory/refract.db`. Subsequent runs only
-fetch new revisions.
+On GitHub Actions the runner starts empty, so the state directory has to be carried
+between runs — cached or committed — or every run is a first run and reports nothing.
+The [cron reference](../cron.md#scheduling-with-github-actions) has a complete
+workflow that does this.
 
-## Step 3: Schedule it with cron
-
-Add to your crontab:
-
-```bash
-# Run every 6 hours
-0 */6 * * * refract cron /path/to/watch-pages.txt --interval 6 -c
-```
-
-Or with GitHub Actions:
-
-```yaml
-name: Refract Monitor
-on:
-  schedule:
-    - cron: '0 */6 * * *'
-jobs:
-  monitor:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: oven-sh/setup-bun@v1
-      - run: bun add -g @refract-org/cli
-      - run: refract cron watch-pages.txt --interval 6 -c
-```
-
-Refract respects MediaWiki rate limits automatically (maxlag backoff). No additional
-configuration needed.
+Refract spaces its requests to the MediaWiki API (100 ms apart by default) and retries
+a 429 or 503 after the server's `Retry-After`.
 
 ## Step 4: Set up notifications
+
+Notifications go out only when a page has new or resolved events.
 
 ### Slack
 
@@ -87,26 +74,31 @@ export SLACK_WEBHOOK_URL="https://hooks.slack.com/services/..."
 refract cron watch-pages.txt --interval 24 --notify-slack
 ```
 
-Refract POSTs a summary to the webhook when new events are detected:
+The message lists each changed page with its counts:
 
 ```
-Refract detected 12 new events on 3 pages:
-- COVID-19: 2 citation_removed, 1 template_added (NPOV)
-- mRNA_vaccine: 4 sentence_modified, 1 citation_replaced
-- SARS-CoV-2: 3 revert_detected, 1 edit_cluster_detected
+🔭 Refract Observation Report
+2 page(s) changed since last observation.
+
+COVID-19
+3 new event(s), 0 resolved
+⚠️ Changes detected
+
+mRNA_vaccine
+5 new event(s), 1 resolved
+⚠️ Changes detected
 ```
 
 ### Email
 
 ```bash
-export SMTP_HOST="smtp.example.com"
-export SMTP_PORT="587"
-export SMTP_USER="alerts@example.com"
-export SMTP_PASS="your-password"
-export NOTIFY_EMAIL_TO="researcher@example.com"
+export SMTP_TO="researcher@example.com"
 
 refract cron watch-pages.txt --interval 24 --notify-email
 ```
+
+Mail goes through the local `sendmail` (`/usr/sbin/sendmail`, or the path in
+`SMTP_SENDMAIL`). There is no SMTP host, user or password setting.
 
 ### Webhook
 
@@ -114,60 +106,63 @@ refract cron watch-pages.txt --interval 24 --notify-email
 refract cron watch-pages.txt --interval 24 --notify-webhook https://your-server.com/hooks/refract
 ```
 
-Refract POSTs a JSON payload with event summaries. Integrate with PagerDuty, Opsgenie,
-or any webhook consumer.
+Refract POSTs a JSON summary — per page, the new and resolved counts. The payload is
+in the [cron reference](../cron.md#webhook).
 
 ## Step 5: Live polling with watch
 
-For real-time monitoring of a single page:
+For one page, as it changes:
 
 ```bash
 refract watch "COVID-19" --interval 60000
 ```
 
-Polls every 60 seconds for new revisions. When a new revision appears, Refract analyzes
-it and emits events. Combine with Unix pipes for custom notification:
+Polls every 60 seconds (`--interval` is in milliseconds) and prints each new revision
+with the events it produced, one `- <eventType> <detail>` line per event.
+`--section "Vaccine safety"` limits section events to that section. The output is text
+for people; a pipe can still pick lines out of it:
 
 ```bash
-refract watch "COVID-19" --section "Vaccine safety" | while read event; do
-  if echo "$event" | grep -q "citation_removed"; then
-    echo "⚠️ Citation removed from COVID-19 Vaccine safety section" | \
-      mail -s "Refract Alert" researcher@example.com
-  fi
+refract watch "COVID-19" | while read -r line; do
+  case "$line" in
+    *citation_removed*)
+      echo "Citation removed from COVID-19: $line" | mail -s "Refract alert" researcher@example.com ;;
+  esac
 done
 ```
 
-## Step 6: Detect specific patterns
+`watch` polls until stopped (from the next release; up to 0.5.7 it exited after its
+first poll).
 
-Filter for high-signal events:
+## Step 6: Get the events themselves
+
+`cron` reports counts. For the events, run `analyze` over the same window with
+`--json`, which prints one JSON event per line:
 
 ```bash
-# Watch for citation removal — the most common prelude to content change
-refract cron watch-pages.txt --interval 24 | \
-  grep "citation_removed"
+SINCE=$(date -u -d '25 hours ago' +%Y-%m-%dT%H:%M:%SZ)
 
-# Watch for template disputes — NPOV, citation needed, dispute tags
-refract cron watch-pages.txt --interval 24 | \
-  grep "template_added"
+# Citation removals — often the first sign a claim is about to change
+refract analyze "COVID-19" --since "$SINCE" --json | jq -c 'select(.eventType == "citation_removed")'
+
+# Template changes — dispute, neutrality and citation-needed tags
+refract analyze "COVID-19" --since "$SINCE" --json | jq -c 'select(.eventType | startswith("template_"))'
 ```
 
-The output is NDJSON — pipe it into `jq`, DuckDB, or your own analysis pipeline.
+The window opens an hour before the day it covers because the first revision inside a
+`--since` window is not diffed against the one before it.
 
 ## Step 7: Integrate with your own alerts
 
-The cron output is machine-readable JSON. Parse it programmatically:
-
 ```bash
-refract cron watch-pages.txt --interval 24 --format ndjson | while read event; do
-  event_type=$(echo "$event" | jq -r '.eventType')
-  page=$(echo "$event" | jq -r '.pageTitle')
-  section=$(echo "$event" | jq -r '.section')
-
-  if [ "$event_type" = "citation_removed" ]; then
-    echo "ALERT: Citation removed from $page / $section"
-    # Trigger your alerting pipeline
-  fi
-done
+while read -r page; do
+  refract analyze "$page" --since "$SINCE" --json | while read -r event; do
+    if [ "$(echo "$event" | jq -r '.eventType')" = "citation_removed" ]; then
+      echo "ALERT: citation removed from $page / $(echo "$event" | jq -r '.section')"
+      # Trigger your alerting pipeline
+    fi
+  done
+done < watch-pages.txt
 ```
 
 ## Next steps

@@ -44,10 +44,11 @@ All fields are byte-reproducible. Same source, same events, every time.
 
 Refract provides the timeline. Downstream systems provide the judgment.
 
-[NextConsensus](https://nextconsensus.com) uses Refract timelines to evaluate
-whether a specific healthcare claim is still supportable for a specific use
-in a specific decision context. But Refract itself remains domain-neutral —
-it works on any versioned text source.
+[NextConsensus](https://nextconsensus.com), which maintains Refract, reads
+these timelines as one input to its own work on how claims move across
+institutions; what it concludes from them is its judgment, made downstream and
+described on its own site. Refract itself remains domain-neutral — it works on
+any versioned text source.
 
 ## See also
 
