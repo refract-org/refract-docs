@@ -1,13 +1,13 @@
 [
 	{ "title": "Home", "slug": "index" },
 	{
-		"title": "Getting Started",
+		"title": "Getting started",
 		"slug": null,
 		"children": [
 			{ "title": "Why Refract", "slug": "why-refract" },
-			{ "title": "Live Demo", "slug": "demo" },
-			{ "title": "Quick Start", "slug": "quickstart" },
-			{ "title": "Complete Workflow", "slug": "complete-workflow" },
+			{ "title": "Demo", "slug": "demo" },
+			{ "title": "Quick start", "slug": "quickstart" },
+			{ "title": "Complete workflow", "slug": "complete-workflow" },
 			{ "title": "Install", "slug": "install" },
 			{ "title": "Concepts", "slug": "concepts" }
 		]
@@ -17,38 +17,38 @@
 		"slug": null,
 		"children": [
 			{ "title": "CLI", "slug": "cli" },
-			{ "title": "SDK / Packages", "slug": "sdk" },
-			{ "title": "Event Schema", "slug": "schema" },
-			{ "title": "Event Taxonomy", "slug": "events" },
-			{ "title": "Temporal Model", "slug": "temporal-model" },
-			{ "title": "Depth Levels", "slug": "depth" },
-			{ "title": "Bundles & Manifests", "slug": "bundle-manifest" },
+			{ "title": "SDK / packages", "slug": "sdk" },
+			{ "title": "Event schema", "slug": "schema" },
+			{ "title": "Event taxonomy", "slug": "events" },
+			{ "title": "Temporal model", "slug": "temporal-model" },
+			{ "title": "Depth levels", "slug": "depth" },
+			{ "title": "Bundles & manifests", "slug": "bundle-manifest" },
 			{ "title": "Evaluation", "slug": "eval" },
-			{ "title": "Architecture Decisions", "slug": "architecture-decisions" }
+			{ "title": "Architecture decisions", "slug": "architecture-decisions" }
 		]
 	},
 	{
 		"title": "Integration",
 		"slug": null,
 		"children": [
-			{ "title": "Downstream Integration", "slug": "downstream" },
-			{ "title": "MCP / AI Agents", "slug": "mcp" },
+			{ "title": "Downstream integration", "slug": "downstream" },
+			{ "title": "MCP / AI agents", "slug": "mcp" },
 			{ "title": "Python SDK", "slug": "python-sdk" },
 			{ "title": "Refract UI", "slug": "visualizer" },
 			{ "title": "Analytics with DuckDB", "slug": "analytics" },
 			{ "title": "Notebooks", "slug": "notebooks" },
-			{ "title": "Cron Monitoring", "slug": "cron" }
+			{ "title": "Cron monitoring", "slug": "cron" }
 		]
 	},
 	{
 		"title": "Tutorials",
 		"slug": null,
 		"children": [
-			{ "title": "Wikipedia History", "slug": "tutorials/wikipedia-history" },
-			{ "title": "Fandom Canon", "slug": "tutorials/fandom-canon" },
-			{ "title": "Citation Churn", "slug": "tutorials/citation-churn" },
-			{ "title": "Dispute Timeline", "slug": "tutorials/dispute-timeline" },
-			{ "title": "Cross-Wiki Diff", "slug": "tutorials/cross-wiki-diff" },
+			{ "title": "Wikipedia history", "slug": "tutorials/wikipedia-history" },
+			{ "title": "Fandom canon", "slug": "tutorials/fandom-canon" },
+			{ "title": "Citation churn", "slug": "tutorials/citation-churn" },
+			{ "title": "Dispute timeline", "slug": "tutorials/dispute-timeline" },
+			{ "title": "Cross-wiki diff", "slug": "tutorials/cross-wiki-diff" },
 			{ "title": "Refract UI", "slug": "tutorials/refract-ui" }
 		]
 	},
@@ -58,12 +58,12 @@
 		"children": [
 			{ "title": "Glossary", "slug": "glossary" },
 			{ "title": "FAQ", "slug": "faq" },
-			{ "title": "Interpreting Output", "slug": "interpretation" },
+			{ "title": "Interpreting output", "slug": "interpretation" },
 			{ "title": "Security", "slug": "security" },
 			{ "title": "Boundary", "slug": "boundary" },
 			{ "title": "Naming", "slug": "naming" },
-			{ "title": "Frontier Use Cases", "slug": "frontier-use-cases" },
-			{ "title": "Contributing to Docs", "slug": "contributing-docs" }
+			{ "title": "Frontier use cases", "slug": "frontier-use-cases" },
+			{ "title": "Contributing to docs", "slug": "contributing-docs" }
 		]
 	}
 ]
