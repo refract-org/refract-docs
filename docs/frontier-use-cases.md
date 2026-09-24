@@ -299,10 +299,6 @@ This applies across: public wikis, policy drafts, standards documents, open-sour
 
 ## Synthesis
 
-The frontier is not summarizing version history.
-
-The frontier is turning version history into claim-level provenance.
-
 The reusable primitive is:
 
 **claim + source + wording + placement + stability + time**

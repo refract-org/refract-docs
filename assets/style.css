@@ -11,7 +11,6 @@
 	--bg-deep: #07090f;
 	--bg-surface: #0c0f17;
 	--bg-elevated: #11151f;
-	--bg-glass: rgba(12, 15, 23, 0.8);
 	--border: rgba(255, 255, 255, 0.06);
 	--border-strong: rgba(255, 255, 255, 0.12);
 	--text: #e2e4ed;
@@ -27,9 +26,10 @@
 	--radius-sm: 4px;
 	--radius-md: 8px;
 	--radius: 12px;
-	--font: "Manrope", system-ui, sans-serif;
-	--font-heading: "Syne", system-ui, sans-serif;
-	--mono: "Recursive", monospace;
+	--font: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+	--font-heading: var(--font);
+	--mono:
+		ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
 }
 
 html {
@@ -39,29 +39,11 @@ html {
 
 body {
 	font-family: var(--font);
-	font-weight: 350;
 	color: var(--text);
 	background: var(--bg-deep);
 	line-height: 1.7;
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
-}
-
-/* ── Ambient Background ── */
-body::before {
-	content: "";
-	position: fixed;
-	top: 0;
-	right: 0;
-	width: 60%;
-	height: 60%;
-	background: radial-gradient(
-		ellipse at top right,
-		rgba(45, 212, 191, 0.04),
-		transparent 60%
-	);
-	pointer-events: none;
-	z-index: 0;
 }
 
 .layout {
@@ -145,15 +127,13 @@ body::before {
 	font-weight: 400;
 	transition:
 		background 0.15s ease,
-		color 0.15s ease,
-		padding-left 0.15s ease;
+		color 0.15s ease;
 	margin: 0;
 }
 
 .nav-link:hover {
 	background: var(--accent-soft);
 	color: var(--accent);
-	padding-left: 14px;
 }
 
 .nav-link.active {
@@ -171,10 +151,6 @@ body::before {
 .nav-group .nav-link {
 	padding-left: 20px;
 	font-size: 0.8125rem;
-}
-
-.nav-group .nav-link:hover {
-	padding-left: 24px;
 }
 
 /* ── Sidebar Footer ── */
@@ -215,18 +191,6 @@ body::before {
 	padding: 48px 48px 96px 64px;
 	max-width: 820px;
 	position: relative;
-	animation: fadeSlideIn 0.4s ease-out both;
-}
-
-@keyframes fadeSlideIn {
-	from {
-		opacity: 0;
-		transform: translateY(8px);
-	}
-	to {
-		opacity: 1;
-		transform: translateY(0);
-	}
 }
 
 /* ── Mobile Menu ── */
@@ -351,7 +315,6 @@ body::before {
 /* ── Code ── */
 .content code {
 	font-family: var(--mono);
-	font-variation-settings: "MONO" 1;
 	font-size: 0.85em;
 	background: var(--code-bg);
 	color: var(--accent);
@@ -363,7 +326,6 @@ body::before {
 
 .content pre {
 	font-family: var(--mono);
-	font-variation-settings: "MONO" 1;
 	background: var(--code-bg);
 	color: var(--code-text);
 	padding: 20px 24px;
@@ -453,12 +415,8 @@ body::before {
 	font-size: 0.9rem;
 	transition:
 		background 0.15s ease,
-		transform 0.15s ease,
-		box-shadow 0.15s ease;
-}
-
-.button:hover {
-	transform: translateY(-1px);
+		border-color 0.15s ease,
+		color 0.15s ease;
 }
 
 .button.primary {
@@ -468,7 +426,6 @@ body::before {
 
 .button.primary:hover {
 	background: #0f766e;
-	box-shadow: 0 0 24px rgba(45, 212, 191, 0.2);
 }
 
 .button.secondary {
@@ -502,7 +459,6 @@ body::before {
 		position: fixed;
 		inset: 0;
 		background: rgba(0, 0, 0, 0.6);
-		backdrop-filter: blur(4px);
 		z-index: 30;
 	}
 
@@ -552,12 +508,7 @@ body::before {
 	top: 0;
 	width: 100%;
 	height: 3px;
-	background: linear-gradient(
-		90deg,
-		var(--accent) 0%,
-		var(--accent-dim) 50%,
-		var(--amber) 100%
-	);
+	background: var(--accent);
 	z-index: 100;
 	transform-origin: 0 50%;
 	transform: scaleX(0);
@@ -738,7 +689,6 @@ body::before {
 	position: fixed;
 	inset: 0;
 	background: rgba(3, 5, 10, 0.7);
-	backdrop-filter: blur(12px);
 	z-index: 1000;
 	display: none;
 	justify-content: center;
@@ -859,53 +809,10 @@ body::before {
 }
 
 .feature-card {
-	background:
-		linear-gradient(180deg, rgba(255, 255, 255, 0.03), transparent 58%),
-		var(--bg-glass);
+	background: var(--bg-surface);
 	border: 1px solid var(--border);
 	border-radius: var(--radius-md);
 	padding: 1.5rem;
-	backdrop-filter: blur(18px);
-	transition:
-		border-color 0.2s ease,
-		transform 0.2s ease,
-		box-shadow 0.2s ease;
-	position: relative;
-	overflow: hidden;
-}
-
-.feature-card:hover {
-	border-color: rgba(45, 212, 191, 0.42);
-	transform: translateY(-2px);
-	box-shadow: 0 8px 24px rgba(45, 212, 191, 0.08);
-}
-
-.feature-card::before {
-	content: "";
-	position: absolute;
-	top: 0;
-	left: 0;
-	width: 100%;
-	height: 2px;
-	background: linear-gradient(90deg, var(--accent), var(--accent-dim));
-	opacity: 0;
-	transition: opacity 0.2s ease;
-}
-
-.feature-card:hover::before {
-	opacity: 1;
-}
-
-.feature-icon {
-	width: 2.25rem;
-	height: 2.25rem;
-	display: grid;
-	place-items: center;
-	border: 1px solid var(--border);
-	border-radius: var(--radius-sm);
-	background: rgba(255, 255, 255, 0.03);
-	font-size: 1.5rem;
-	margin-bottom: 0.75rem;
 }
 
 .feature-card h3 {
@@ -934,26 +841,13 @@ body::before {
 }
 
 .usecase-card {
-	background:
-		linear-gradient(180deg, rgba(255, 255, 255, 0.025), transparent 60%),
-		var(--bg-glass);
+	background: var(--bg-surface);
 	border: 1px solid var(--border);
 	border-radius: var(--radius-md);
 	padding: 1.5rem;
 	display: flex;
 	flex-direction: column;
 	min-height: 100%;
-	backdrop-filter: blur(18px);
-	transition:
-		border-color 0.2s ease,
-		transform 0.2s ease,
-		box-shadow 0.2s ease;
-}
-
-.usecase-card:hover {
-	border-color: rgba(45, 212, 191, 0.36);
-	transform: translateY(-2px);
-	box-shadow: 0 8px 24px rgba(45, 212, 191, 0.06);
 }
 
 .usecase-badge {
@@ -1018,13 +912,10 @@ body::before {
 }
 
 .column-card {
-	background:
-		linear-gradient(180deg, rgba(255, 255, 255, 0.025), transparent 60%),
-		var(--bg-glass);
+	background: var(--bg-surface);
 	border: 1px solid var(--border);
 	border-radius: var(--radius-md);
 	padding: 1.5rem;
-	backdrop-filter: blur(18px);
 }
 
 .column-card.focus {

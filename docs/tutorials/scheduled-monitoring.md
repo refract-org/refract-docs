@@ -77,16 +77,16 @@ refract cron watch-pages.txt --interval 24 --notify-slack
 The message lists each changed page with its counts:
 
 ```
-🔭 Refract Observation Report
+Refract observation report
 2 page(s) changed since last observation.
 
 COVID-19
 3 new event(s), 0 resolved
-⚠️ Changes detected
+Changes detected
 
 mRNA_vaccine
 5 new event(s), 1 resolved
-⚠️ Changes detected
+Changes detected
 ```
 
 ### Email

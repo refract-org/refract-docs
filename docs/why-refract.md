@@ -1,7 +1,7 @@
 # Why Refract?
 
-Refract is the open claim-history layer for public knowledge. If you need to know what
-changed, when, and how — not just what a page says right now — Refract is the answer.
+Refract is the open claim-history layer for public knowledge: it tells you what changed
+on a page, when, and in which revision.
 
 ## Who this is for
 
@@ -58,7 +58,7 @@ refract cron pages.txt --notify-webhook https://hooks.example.com/refract
 
 You need an MCP-native tool to give your agent claim-awareness. `refract mcp` starts
 a JSON-RPC server that any MCP client can connect to. Your agent can call
-`analyze`, `claim`, and `export` directly — no API key required, no setup, no config.
+`analyze`, `claim`, and `export` directly; no API key is needed.
 
 ```json
 {
@@ -92,8 +92,7 @@ refract diff "Darth_Vader" \
 | **Provenance-tagged** — every event records which analyzer, what version, what parameters | Most tools produce output without an audit trail |
 | **26 event types** — sentence lifecycle, citations, templates, reverts, sections, categories, wikilinks, talk pages, edit clusters, protection changes | Most tools track 1–3 signal types |
 | **BYO-inference** — every analyzer threshold is a pluggable function. Defaults work offline. Plug a model where you need one. | Most tools are either all-model or no-model, not selectable per boundary |
-| **Merkle-verifiable** — signed bundles and replay manifests for audit trail integrity | No comparable tool offers cryptographic verification |
-| **Zero-install** — `npx @refract-org/cli analyze "Earth"` works with no download, no config | Most tools require installation, API keys, or account setup |
+| **Hash-verifiable** — evidence bundles carry a SHA-256 hash, replay manifests a Merkle root | No comparable tool offers cryptographic verification |
 | **MCP-native** — AI agents connect via built-in MCP server | Most tools have no AI agent integration |
 
 ## When Refract is not the right tool
@@ -106,15 +105,14 @@ refract diff "Darth_Vader" \
 ## Quick evaluation
 
 ```bash
-# 30 seconds to first result
+# Brief analysis
 npx @refract-org/cli analyze "Earth" --depth brief
 
-# 2 minutes to a full analysis
+# Detailed analysis
 npx @refract-org/cli analyze "Bitcoin" --depth detailed
 
-# See it all in a browser
+# Browse the events in a local web UI
 refract explore "Bitcoin"
 ```
 
-The full [complete workflow](complete-workflow.md) walks through a realistic
-use case from zero to insight in 5 steps.
+The [complete workflow](complete-workflow.md) walks through one use case in 5 steps.

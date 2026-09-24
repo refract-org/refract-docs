@@ -254,7 +254,6 @@ refract analyze "Page" --depth forensic > events.jsonl
 ```
 
 A reviewer runs the same commands on the same revisions, gets the same hashes.
-The evaluation is reproducible — not just the paper, but the data.
 
 ## Next steps
 

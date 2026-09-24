@@ -86,7 +86,7 @@ document.querySelectorAll(".content pre").forEach((preBlock) => {
 			await navigator.clipboard.writeText(code.innerText);
 			btn.classList.add("copied");
 			btn.innerHTML =
-				'<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg><span>Copied!</span>';
+				'<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg><span>Copied</span>';
 			setTimeout(() => {
 				btn.classList.remove("copied");
 				btn.innerHTML =
