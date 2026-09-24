@@ -36,7 +36,7 @@ See [quickstart](https://refract-org.github.io/refract-docs/quickstart/) for a f
 
 ## Project status
 
-Refract is actively developed by [NextConsensus](https://nextconsensus.com). v0.5.14 — deterministic observation layer is production-quality.
+Refract is actively developed by [NextConsensus](https://nextconsensus.com). The newest CLI on npm, 0.5.7, does not start — it was published against library code that never reached npm — so until the next release, [build from source](docs/install.md#from-source). The library packages on npm install and import normally.
 
 ## License
 

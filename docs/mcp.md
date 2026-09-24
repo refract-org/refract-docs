@@ -16,6 +16,16 @@ The server starts and waits for MCP client connections on stdio. Connect any MCP
 
 ## Connecting AI coding agents
 
+The server is the `mcp` command of the `@refract-org/cli` package, so that is the
+package a client configuration names. `@refract-org/mcp` is a library with no
+executable, and the unscoped npm package `refract` is an unrelated project —
+`npx refract mcp` runs someone else's code.
+
+> **npm status, 2026-09-24:** `@refract-org/cli@0.5.7`, the newest release on npm,
+> does not start. Until the next release is published, point the client at a
+> [source build](install.md#from-source):
+> `"command": "node", "args": ["/path/to/refract/packages/cli/dist/src/cli.js", "mcp"]`.
+
 ### Claude Code
 
 ```json
@@ -23,7 +33,7 @@ The server starts and waits for MCP client connections on stdio. Connect any MCP
   "mcpServers": {
     "refract": {
       "command": "npx",
-      "args": ["@refract-org/mcp", "mcp"]
+      "args": ["-y", "@refract-org/cli", "mcp"]
     }
   }
 }
@@ -42,7 +52,7 @@ Claude Code calls Refract's MCP tools to fetch the analysis, reads the structure
   "mcpServers": {
     "refract": {
       "command": "npx",
-      "args": ["@refract-org/mcp", "mcp"]
+      "args": ["-y", "@refract-org/cli", "mcp"]
     }
   }
 }
@@ -55,7 +65,7 @@ Claude Code calls Refract's MCP tools to fetch the analysis, reads the structure
   "mcpServers": {
     "refract": {
       "command": "npx",
-      "args": ["@refract-org/mcp", "mcp"]
+      "args": ["-y", "@refract-org/cli", "mcp"]
     }
   }
 }
@@ -159,5 +169,5 @@ echo '{"jsonrpc":"2.0","id":1,"method":"tools/list"}' | refract mcp | head -1
 You should receive a JSON-RPC response listing the available tools. For interactive testing, use the MCP Inspector:
 
 ```bash
-npx @modelcontextprotocol/inspector refract mcp
+npx @modelcontextprotocol/inspector npx -y @refract-org/cli mcp
 ```

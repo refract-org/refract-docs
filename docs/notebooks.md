@@ -183,7 +183,7 @@ The [refract-py](https://github.com/refract-org/refract-py) package provides typ
 dataclasses and pandas integration for Python workflows:
 
 ```bash
-pip install refract-py
+pip install git+https://github.com/refract-org/refract-py.git  # not on PyPI
 ```
 
 ### Load events with typed dataclasses
@@ -239,6 +239,6 @@ docs = loader.load()
 ```
 
 The Python SDK wraps the `@refract-org/cli` npm package — install both for full
-functionality: `pip install refract-py && npm install -g @refract-org/cli`. Typed
+functionality: `pip install git+https://github.com/refract-org/refract-py.git` plus the Refract CLI. Typed
 exceptions like `RefractConfigError`, `RefractFetchError`, and
 `RefractInterpretationError` provide structured error handling.

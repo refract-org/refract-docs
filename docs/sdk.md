@@ -144,11 +144,12 @@ Key exports:
 
 ### `@refract-org/cli`
 
-The `refract` / `wikihistory` CLI tool (14 commands: analyze, claim, classify, cron, diff, eval, explore, export, init, mcp, snapshot, stream, visualize, watch). See [CLI reference](./cli).
+The `refract` / `wikihistory` CLI tool (15 commands: analyze, claim, classify, cron, delegation, diff, eval, explore, export, init, mcp, snapshot, stream, visualize, watch). See [CLI reference](./cli). The release on npm (0.5.7) does not start; see [installation](./install).
 
 ### `@refract-org/persistence`
 
-SQLite storage adapter (uses `bun:sqlite`).
+SQLite storage adapter (uses `bun:sqlite`). Not published to npm: import it from a
+source checkout, under Bun.
 
 ```typescript
 import { Persistence } from "@refract-org/persistence";

@@ -9,6 +9,10 @@ See [installation](install.md) for all options (npx, npm, bun, Docker, from sour
 
 ## Install the CLI
 
+> **Until the next release reaches npm, build from source.** `@refract-org/cli@0.5.7`
+> does not start; [installation](install.md#from-source) has the three commands and
+> the status note.
+
 **Zero install** (no download needed):
 
 ```bash

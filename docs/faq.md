@@ -2,7 +2,7 @@
 
 ## Rate limits
 
-Refract respects the MediaWiki API's `maxlag` parameter and backs off automatically. If you see `429 Too Many Requests`, wait a few minutes before retrying. Use `-c` / `--cache` to avoid re-fetching pages you've already analyzed.
+Refract spaces its requests to the MediaWiki API (100 ms apart by default) and retries a `429` or `5xx` up to three times, waiting for the server's `Retry-After`. If you still see `429 Too Many Requests`, wait a few minutes before retrying: Wikimedia rate-limits by client, and a shared IP (a CI runner, a cloud host) can exhaust it for everyone on it. The CLI does not send `maxlag`; the `MediaWikiClient` library takes a `maxlag` option from the next release. `-c` / `--cache` avoids re-fetching, but needs `@refract-org/persistence`, which is only available from a source checkout.
 
 ## "Page too large" errors
 
@@ -95,7 +95,9 @@ persistent — clear it with `rm -rf ~/.wikihistory/` when disk space is tight.
 
 ### API rate limits
 
-Wikipedia enforces `maxlag` (default: 5 seconds). Refract respects this and backs off
-automatically. Expect ~5–10 requests per second to Wikipedia. For non-Wikipedia
-MediaWiki instances, rate limits vary. If you hit 429 errors consistently, increase
-poll intervals or contact the wiki's administrator.
+Refract sends at most one request per 100 ms from a client (about 10 per second) and
+retries a `429` or `5xx` after the server's `Retry-After`. `maxlag` is a parameter a
+client chooses to send; the CLI does not send it, and library users can set it on
+`MediaWikiClient` (next release). For non-Wikipedia MediaWiki instances, rate limits
+vary. If you hit 429 errors consistently, increase poll intervals or contact the
+wiki's administrator.

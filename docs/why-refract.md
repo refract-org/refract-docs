@@ -65,7 +65,7 @@ a JSON-RPC server that any MCP client can connect to. Your agent can call
   "mcpServers": {
     "refract": {
       "command": "npx",
-      "args": ["@refract-org/mcp", "mcp"]
+      "args": ["-y", "@refract-org/cli", "mcp"]
     }
   }
 }

@@ -28,9 +28,12 @@ refract analyze [page] [options]
 | `-d, --depth <d>` | `detailed` | Analysis depth: `brief`, `detailed`, `forensic`. See [depth levels](depth.md). |
 | `--from <revId>` | — | Start revision ID |
 | `--to <revId>` | — | End revision ID |
-| `--since <ts>` | — | Filter revisions after this ISO timestamp |
-| `-c, --cache` | off | Cache revisions in SQLite (`~/.wikihistory/refract.db`) |
-| `--pages-file <path>` | — | Batch file of page titles (one per line) |
+| `--since <ts>` | — | Analyze revisions from this ISO timestamp. The first revision in the window is not diffed against the one before it. |
+| `-j, --json` | off | Print events as JSON, one per line (NDJSON), instead of the interactive view |
+| `--brief-limit <n>` | `20` | Revisions read at `brief` depth: the latest N (the oldest N up to 0.5.7) |
+| `-c, --cache` | off | Cache revisions in SQLite (`~/.wikihistory/refract.db`). Needs Bun and `@refract-org/persistence`, which is only available from a source checkout. |
+| `--pages-file <path>` | — | Batch file of page titles (one per line). Prints a total, not the events. |
+| `--batch-concurrency <n>` | `4` | Pages analyzed at once with `--pages-file` |
 | `--api <url>` | `en.wikipedia.org` | MediaWiki API base URL |
 | `--cache-dir <path>` | `~/.wikihistory` | Cache directory path |
 | `-r, --report` | off | Output `ObservationReport` instead of raw events |
@@ -54,6 +57,7 @@ refract claim <page> [options]
 |---|---|---|
 | `page` | required (positional) | Page title |
 | `-t, --text <text>` | required | Claim text to track |
+| `--limit <n>` | `50` | Revisions read: the latest N (the oldest N up to 0.5.7) |
 | `-c, --cache` | off | Cache revisions in SQLite |
 | `--api <url>` | `en.wikipedia.org` | MediaWiki API base URL |
 
@@ -90,8 +94,11 @@ refract cron <pages-file> [options]
 | `--notify-slack` | off | Send Slack notification on changes |
 | `--notify-email` | off | Send email notification on changes |
 | `--notify-webhook <u>` | — | Send generic webhook POST on changes |
-| `--export <dir>` | — | Export each observation to timestamped files |
+| `--cache-dir <path>` | `~/.wikihistory` | Where each page's previous observation is kept; persist it between runs |
 | `--api <url>` | `en.wikipedia.org` | MediaWiki API base URL |
+
+Prints a per-page report and `Total new events: N`, and exits 1 when N > 0 — or on any
+error. See [scheduled monitoring](cron.md) for the comparison, state and scheduling.
 
 ## `refract diff`
 
@@ -178,9 +185,34 @@ refract export <page> [options]
 | `-f, --format <fmt>` | `json` | Output format: `json`, `csv`, `ndjson`, `html`, `parquet` |
 | `--bundle` | off | Export as signed evidence bundle (SHA-256). See [bundle format](bundle-manifest.md). |
 | `--manifest` | off | Export as replay manifest with all hashes. See [manifest format](bundle-manifest.md). |
-| `-r, --report` | off | Output `ObservationReport` instead of raw events |
+| `--flatten` | off | Flatten nested fields into columns (`csv`) |
 | `--similarity <n>` | `0.8` | Sentence matching threshold (0–1) |
 | `--api <url>` | `en.wikipedia.org` | MediaWiki API base URL |
+
+`export` always analyzes the page's full history at `detailed` depth. With no events it
+writes nothing to stdout (the notice goes to stderr), so an empty NDJSON file stays
+empty.
+
+## `refract delegation`
+
+Write [STD-07](https://ethotechnics.org/standards/std-07-revisable-delegation-record)
+discrepancy records for another system to read. Refract does not decide which change
+matters: the operator states it, and none of the three required options has a default.
+
+```bash
+refract delegation <page> --subject <id> --expected <clause> --when <rule> [options]
+```
+
+| Flag | Default | Description |
+|---|---|---|
+| `page` | required (positional) | Page title |
+| `--subject <id>` | required | What the receiving system calls the thing this is about |
+| `--expected <clause>` | required | The assumption these changes would violate |
+| `--when <rule>` | required | Which events count: `weakening`, `strengthening`, `direction-changed`, `citation-removed`, `any` |
+| `-s, --section <name>` | — | Only events in this section |
+| `-o, --out <file>` | stdout | Write the records to a file |
+
+Exits 2 on missing or invalid input.
 
 ## `refract explore`
 
@@ -282,3 +314,9 @@ These options apply to most commands:
 | `--api-key <token>` | API key for bearer token auth |
 | `--api-user <user>` | Username for basic auth |
 | `--api-password <pass>` | Password for basic auth |
+
+Client-credential headers (`X-OAuth-Client-Id`, `X-OAuth-Client-Secret`) come from the
+`REFRACT_OAUTH_CLIENT_ID` and `REFRACT_OAUTH_CLIENT_SECRET` environment variables from
+the next release. Up to 0.5.7 they were read from `OAUTH_CLIENT_ID` and
+`OAUTH_CLIENT_SECRET` and sent to whatever wiki was queried, Wikipedia included; do
+not set those names for Refract.

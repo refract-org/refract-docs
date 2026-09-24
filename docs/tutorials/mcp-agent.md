@@ -30,7 +30,7 @@ Add to your Claude Code MCP config:
   "mcpServers": {
     "refract": {
       "command": "npx",
-      "args": ["@refract-org/mcp", "mcp"]
+      "args": ["-y", "@refract-org/cli", "mcp"]
     }
   }
 }
@@ -43,7 +43,7 @@ Add to your Claude Code MCP config:
   "mcpServers": {
     "refract": {
       "command": "npx",
-      "args": ["@refract-org/mcp", "mcp"]
+      "args": ["-y", "@refract-org/cli", "mcp"]
     }
   }
 }
@@ -56,7 +56,7 @@ Add to your Claude Code MCP config:
   "mcpServers": {
     "refract": {
       "command": "npx",
-      "args": ["@refract-org/mcp", "mcp"]
+      "args": ["-y", "@refract-org/cli", "mcp"]
     }
   }
 }
@@ -157,7 +157,7 @@ You should receive a JSON-RPC response listing the available tools. For interact
 testing:
 
 ```bash
-npx @modelcontextprotocol/inspector refract mcp
+npx @modelcontextprotocol/inspector npx -y @refract-org/cli mcp
 ```
 
 ## Next steps

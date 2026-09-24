@@ -97,7 +97,7 @@ the token scope and format.
 | `401 Unauthorized` | Missing or invalid token | Check `--api-key` is correct and not expired |
 | `403 Forbidden` | Token lacks read permission | Verify token scope with wiki admin |
 | Connection refused | Wrong API URL | Ensure URL ends in `/api.php` and the wiki is reachable |
-| `maxlag` errors | Wiki rate-limited | Refract backs off automatically; wait and retry |
+| `maxlag` errors | Database replicas lagging behind the `maxlag` you set on `MediaWikiClient` | Retried after the wiki's `Retry-After` (next release); if they persist, wait |
 
 ## Step 7: Run regular analysis with auth
 

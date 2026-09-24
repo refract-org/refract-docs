@@ -42,7 +42,7 @@ Refract produces a deterministic event stream — standard NDJSON with typed sch
 | **Retrieval quality scoring** | `refract_eval.score_retrieval_quality()` — score passages by stability | [RAG tutorial](tutorials/rag-provenance.md) |
 | **Provenance hallucination** | `refract_eval.check_provenance()` — verify if a source ever existed | [Model evaluation tutorial](tutorials/model-evaluation.md) |
 | **Benchmark submission** | Standard 10-page benchmark, submission format, reproducibility requirements | [BENCHMARK.md](https://github.com/refract-org/refract/blob/main/BENCHMARK.md) |
-| **Colab notebook** | Ready-to-run notebook — `pip install refract-py` and go | [notebooks/model-evaluation.ipynb](notebooks/model-evaluation.ipynb) |
+| **Colab notebook** | Ready-to-run notebook — `pip install git+https://github.com/refract-org/refract-py.git` and go | [notebooks/model-evaluation.ipynb](notebooks/model-evaluation.ipynb) |
 
 ### Notebooks and visualization
 
@@ -69,7 +69,7 @@ Refract produces a deterministic event stream — standard NDJSON with typed sch
 |---|---|---|
 | **Docker** | `Dockerfile` in the refract repo. `docker build -t refract .` | [Install](install.md) |
 | **AWS Lambda** | Run `refract cron` in a Lambda function with a 15-minute timeout. | [Cron](cron.md) |
-| **Cloudflare Workers** | Run `refract` via `npx` in a Worker. Store events in D1, export to R2. | [Downstream](downstream.md#complementary-technologies) |
+| **Cloudflare Workers** | Import the library packages in a Worker (`nodejs_compat`); the CLI cannot run there. Store events in D1, export to R2. | [Cron: serverless](cron.md#serverless-platforms) |
 | **Private wikis** | Bearer token, basic auth, OAuth2. `--api-key`, `--api-user`, `--api-password`. | [Private wiki tutorial](tutorials/private-wiki.md) |
 
 ### Knowledge graphs and semantic web
