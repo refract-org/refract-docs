@@ -41,3 +41,52 @@ refract export "Earth" --manifest > earth-manifest.json
 ```
 
 Use manifests when you need lightweight integrity verification — for example, checking whether an observation has changed without re-downloading all events. The `@refract-org/evidence-graph` package exports `createReplayManifest`, `buildMerkleTree`, `getMerkleProof`, and `verifyMerkleProof` for programmatic use.
+
+## Verification bundle with Merkle proofs (`--proof`)
+
+A verification bundle is a self-contained, offline-verifiable package designed for high-stakes audits, legal submissions, and investigative reporting. It bundles:
+
+1. The replay manifest (input revision hashes, analyzer versions, and computed Merkle root).
+2. The full structured event array.
+3. Individual cryptographic Merkle inclusion proofs for every event in the trajectory.
+
+```bash
+refract export "Earth" --proof > earth-proof.json
+```
+
+```json
+{
+  "format": "refract-verification-bundle/v1",
+  "exportedAt": "2026-09-26T00:00:00Z",
+  "manifest": {
+    "pageTitle": "Earth",
+    "merkleRoot": "a3b4c5...",
+    "manifestHash": "d6e7f8...",
+    "inputRevisionHashes": [ ... ],
+    "outputEventHashes": [ ... ]
+  },
+  "events": [ ... ],
+  "proofs": [
+    {
+      "leafHash": "e1...",
+      "leafIndex": 0,
+      "siblings": [ ... ],
+      "rootHash": "a3b4c5..."
+    }
+  ]
+}
+```
+
+### Verifying a bundle and generating audit receipts
+
+Anyone can verify the cryptographic chain of custody offline using the CLI without connecting to any external network or database:
+
+```bash
+# Verify integrity
+refract verify earth-proof.json
+
+# Generate an interactive HTML audit receipt
+refract verify earth-proof.json --html receipt.html
+```
+
+The resulting `receipt.html` is a standalone, single-file certificate displaying the verification badges, Merkle tree root, and each verified event — ready to be attached as an exhibit or published alongside an investigative article.

@@ -185,6 +185,7 @@ refract export <page> [options]
 | `-f, --format <fmt>` | `json` | Output format: `json`, `csv`, `ndjson`, `html`, `parquet` |
 | `--bundle` | off | Export as signed evidence bundle (SHA-256). See [bundle format](bundle-manifest.md). |
 | `--manifest` | off | Export as replay manifest with all hashes. See [manifest format](bundle-manifest.md). |
+| `--proof` | off | Export as self-contained verification bundle with Merkle inclusion proofs. |
 | `--flatten` | off | Flatten nested fields into columns (`csv`) |
 | `--similarity <n>` | `0.8` | Sentence matching threshold (0–1) |
 | `--api <url>` | `en.wikipedia.org` | MediaWiki API base URL |
@@ -192,6 +193,27 @@ refract export <page> [options]
 `export` always analyzes the page's full history at `detailed` depth. With no events it
 writes nothing to stdout (the notice goes to stderr), so an empty NDJSON file stays
 empty.
+
+## `refract verify`
+
+Verify cryptographic Merkle inclusion proofs of a Refract verification bundle and optionally generate an interactive HTML receipt.
+
+```bash
+refract verify <bundle.json> [options]
+```
+
+| Flag | Default | Description |
+|---|---|---|
+| `bundlePath` | required (positional) | Path to verification bundle JSON file |
+| `--html <outPath>` | — | Render an interactive verification receipt HTML file |
+
+```bash
+# Verify integrity
+refract verify earth-proof.json
+
+# Verify and render a standalone, publishable HTML receipt
+refract verify earth-proof.json --html audit-receipt.html
+```
 
 ## `refract delegation`
 

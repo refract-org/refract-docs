@@ -118,14 +118,55 @@ class EvidenceEvent:
 
 ## Integrations
 
-### pandas
+### pandas & polars
 
-Every method accepts `as_frame=True` to return a DataFrame with flattened provenance fields.
+Methods accept `as_frame=True` for a pandas DataFrame, or `as_polars=True` for a high-performance polars DataFrame with flattened provenance fields:
 
 ```python
-df = r.analyze("Bitcoin", depth="forensic", as_frame=True, flatten=True)
-df["event_type"].value_counts()
-df.groupby("section").size().sort_values(ascending=False)
+# pandas
+df_pandas = r.analyze("Bitcoin", depth="forensic", as_frame=True)
+
+# polars
+df_polars = r.analyze("Bitcoin", depth="forensic", as_polars=True)
+print(df_polars.group_by("event_type").len())
+```
+
+### Survival & Duration Analysis (`compute_survival_records`)
+
+For empirical studies measuring claim persistence, qualifier erosion, or institutional lag duration:
+
+```python
+from refract import compute_survival_records
+
+events = r.analyze("Quantum_computing", depth="detailed")
+survival_data = compute_survival_records(events)
+
+# Returns structured duration records with right-censoring flags:
+# [
+#   {
+#     "statement_key": "Lead::Quantum computers use superposition...",
+#     "section": "Lead",
+#     "start_time": "2020-01-01T00:00:00Z",
+#     "end_time": "2022-06-15T00:00:00Z",
+#     "duration_days": 896.0,
+#     "event_observed": 1
+#   },
+#   ...
+# ]
+```
+
+### NetworkX (`to_networkx`)
+
+Export citation references and revision transitions into a directed graph for network analysis, community detection, or centrality calculations:
+
+```python
+from refract import to_networkx
+
+events = r.analyze("Artificial_intelligence", depth="forensic")
+G = to_networkx(events)
+
+import networkx as nx
+print(f"Nodes: {G.number_of_nodes()}, Edges: {G.number_of_edges()}")
 ```
 
 ### LangChain

@@ -76,7 +76,37 @@ const revisions = await client.fetchRevisions("Earth");
 
 Key exports: `MediaWikiClient` (class), `RevisionFetcher` (interface), `AuthConfig`
 
-**Wikidata entity mapping** (new):
+**Generic & Web Archive revision sources**:
+
+```typescript
+import {
+  WaybackRevisionSource,
+  GitRevisionSource,
+  SnapshotDirectorySource,
+} from "@refract-org/ingestion";
+
+// 1. Ingest snapshots from the Wayback Machine for any public URL
+const wayback = new WaybackRevisionSource();
+for await (const rev of wayback.revisions("https://example.gov/public-policy")) {
+  console.log(rev.timestamp, rev.size);
+}
+
+// 2. Ingest commit history from a local Git repository
+const git = new GitRevisionSource({ repoPath: "/path/to/repo" });
+for await (const rev of git.revisions("specs/standard.md")) {
+  console.log(rev.comment, rev.timestamp);
+}
+
+// 3. Ingest timestamped document files from a directory
+const snapshots = new SnapshotDirectorySource({ baseDir: "/path/to/archives" });
+for await (const rev of snapshots.revisions("document-title")) {
+  console.log(rev.revId, rev.content.length);
+}
+```
+
+Key exports: `MediaWikiClient`, `WaybackRevisionSource`, `GitRevisionSource`, `SnapshotDirectorySource`, `XmlDumpRevisionSource`
+
+**Wikidata entity mapping**:
 
 ```typescript
 import { fetchWikidataId, mapPageToEntity, mapPagesToEntities } from "@refract-org/ingestion";
@@ -90,11 +120,44 @@ Key exports: `fetchWikidataId`, `fetchWikidataEntity`, `mapPageToEntity`, `mapPa
 
 ### `@refract-org/analyzers`
 
-Deterministic analyzers for section diffs, citation tracking, revert detection, and template analysis. Exported as lowercase singleton instances — no construction needed.
+Deterministic analyzers for section diffs, citation tracking, text propagation, revert detection, and template analysis. Exported as lowercase singleton instances and pure analysis functions.
 
 ```typescript
-import { sectionDiffer, citationTracker, revertDetector, templateTracker } from "@refract-org/analyzers";
-import type { SectionDiffer, CitationTracker, RevertDetector, TemplateTracker } from "@refract-org/analyzers";
+import {
+  sectionDiffer,
+  citationTracker,
+  analyzeCitationNetwork,
+  detectTextPropagation,
+  revertDetector,
+  templateTracker,
+} from "@refract-org/analyzers";
+```
+
+**Text Borrowing & Propagation Detector**:
+Identifies verbatim or near-verbatim passage borrowing across disparate documents using token n-gram shingling:
+
+```typescript
+const result = detectTextPropagation(sourceDocument, targetDocument, {
+  minSpanTokens: 8,
+  shingleSize: 5,
+});
+
+if (result.isSignificantBorrowing) {
+  console.log("Shared tokens:", result.sharedTokenCount);
+  console.log("Borrowed spans:", result.borrowedSpans);
+}
+```
+
+**Citation Network Analysis**:
+Calculates domain diversity and concentration index (Herfindahl-Hirschman Index) to detect citation loops and insular sourcing:
+
+```typescript
+const citations = citationTracker.extractCitations(wikitext);
+const network = analyzeCitationNetwork(citations);
+
+console.log("Unique sources:", network.uniqueSourceCount);
+console.log("Concentration index:", network.sourceConcentrationIndex);
+console.log("Domain breakdown:", network.domainDistribution);
 ```
 
 All analyzers share a common pattern: extract from wikitext, then diff two extractions. The diffs are change records (`SectionChange`, `CitationChange`, `TemplateChange`), not events; `buildRevisionEvents` (0.5.1+) turns a revision history into `EvidenceEvent`s. Every analyzer accepts an optional `AnalyzerConfig` — thresholds, patterns, and windows that can be tuned per domain. The effective config is recorded in each event's `FactProvenance.parameters` when non-default values are used.
@@ -126,7 +189,7 @@ Key exports:
 
 ### `@refract-org/cli`
 
-The `refract` / `wikihistory` CLI tool (15 commands: analyze, claim, classify, cron, delegation, diff, eval, explore, export, init, mcp, snapshot, stream, visualize, watch). See [CLI reference](./cli). The release on npm (0.5.7) does not start; see [installation](./install).
+The `refract` / `wikihistory` CLI tool (16 commands: analyze, claim, classify, cron, delegation, diff, eval, explore, export, init, mcp, snapshot, stream, verify, visualize, watch). See [CLI reference](./cli). The release on npm (0.5.7) does not start; see [installation](./install).
 
 ### `@refract-org/persistence`
 
