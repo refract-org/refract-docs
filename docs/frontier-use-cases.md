@@ -276,7 +276,32 @@ Apply the same engine to contracts, policies, and versioned legal documents.
 
 Detect: obligations added or narrowed, warranties softened, termination rights expanded, indemnity strengthened, compliance requirements removed.
 
-Example shifts: shall → may, all damages → direct damages, must notify within 24 hours → must notify without undue delay.
+### Forensic Policy & Legislative Propagation
+
+Track text reuse, copied boilerplate, and model legislation across decentralized authorities.
+
+Refract's `detectTextPropagation` analyzer extracts token-level n-gram shingles and contiguous borrowed spans across revisions:
+- Pinpoint identical statutory or regulatory clauses transplanted between jurisdictions.
+- Measure borrowed language percentage and origin revision timestamps.
+- Distinguish original agency findings from external lobbying or model text.
+
+### Citation Network Concentration & Echo Chambers
+
+Analyze the structural diversity of an article or document's evidentiary base.
+
+Refract's `analyzeCitationNetwork` calculates domain-level Herfindahl-Hirschman concentration (HHI) and network diversity metrics:
+- Detect circular citation loops between allied publications.
+- Flag high-concentration pages where contentious claims rely overwhelmingly on a single domain.
+- Surface when a diversity drop precedes narrative contestation or reverts.
+
+### Cryptographic Evidentiary Verification
+
+Generate portable, model-free proof of knowledge change for litigation and journalism.
+
+Refract's verification bundles (`refract export --proof` and `refract verify`) wrap replay manifests, events, and Merkle inclusion proofs:
+- Produce standalone, tamper-evident HTML audit receipts.
+- Cryptographically verify individual event inclusion against root hashes without transmitting entire raw corpora.
+- Establish an unassailable provenance chain for court submissions and investigative reporting.
 
 ---
 
