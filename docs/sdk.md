@@ -76,7 +76,7 @@ const revisions = await client.fetchRevisions("Earth");
 
 Key exports: `MediaWikiClient` (class), `RevisionFetcher` (interface), `AuthConfig`
 
-**Generic & Web Archive revision sources**:
+**Wayback Machine, Git and snapshot revision sources**:
 
 ```typescript
 import {
@@ -133,8 +133,7 @@ import {
 } from "@refract-org/analyzers";
 ```
 
-**Text Borrowing & Propagation Detector**:
-Identifies verbatim or near-verbatim passage borrowing across disparate documents using token n-gram shingling:
+**Text propagation**: the Jaccard similarity of two texts' token shingles, and the verbatim token spans they share:
 
 ```typescript
 const result = detectTextPropagation(sourceDocument, targetDocument, {
@@ -148,8 +147,7 @@ if (result.isSignificantBorrowing) {
 }
 ```
 
-**Citation Network Analysis**:
-Calculates domain diversity and concentration index (Herfindahl-Hirschman Index) to detect citation loops and insular sourcing:
+**Citation concentration**: citation counts per domain and per source, and a Herfindahl-Hirschman index over the domain shares:
 
 ```typescript
 const citations = citationTracker.extractCitations(wikitext);
