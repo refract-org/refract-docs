@@ -294,9 +294,9 @@ Track copied boilerplate and model legislation across jurisdictions.
 
 ### Verification Bundles
 
-`refract export --proof` writes a replay manifest, its events and a Merkle inclusion proof per event hash to one JSON file. `refract verify` checks the manifest hash, the Merkle root and each proof, and `--html` writes the result as an HTML file.
+`refract export --proof` writes a replay manifest, its events and a Merkle inclusion proof per event hash to one JSON file. `refract verify` rehashes each event against the manifest and checks the manifest hash, the Merkle root and each proof, and `--html` writes the result as an HTML file.
 - Publish a Merkle root; anyone who runs the same Refract version over the same revision range gets the same root.
-- Nothing in a bundle is signed, and `verify` does not rehash the events: a pass shows the bundle is internally consistent, not who made it. See [what it checks](bundle-manifest.md#checking-a-bundle).
+- Nothing in a bundle is signed: a pass shows the events match the manifest, not who made the bundle, and fields outside the event hash are not covered. See [what it checks](bundle-manifest.md#checking-a-bundle).
 
 ---
 
