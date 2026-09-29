@@ -361,11 +361,23 @@ body {
 }
 
 /* ── Tables ── */
+/* build.mjs wraps every table in .table-scroll: a table wider than the
+   column scrolls inside it instead of widening the page. */
+.content .table-scroll {
+	max-width: 100%;
+	overflow-x: auto;
+	margin: 1.2em 0;
+}
+
 .content table {
 	width: 100%;
 	border-collapse: collapse;
 	margin: 1.2em 0;
 	font-size: 0.9375rem;
+}
+
+.content .table-scroll > table {
+	margin: 0;
 }
 
 .content th {
@@ -848,19 +860,6 @@ body {
 	display: flex;
 	flex-direction: column;
 	min-height: 100%;
-}
-
-.usecase-badge {
-	align-self: flex-start;
-	background: var(--accent-soft);
-	color: var(--accent);
-	font-size: 0.65rem;
-	font-weight: 700;
-	text-transform: uppercase;
-	letter-spacing: 0.05em;
-	padding: 2px 8px;
-	border-radius: 20px;
-	margin-bottom: 0.75rem;
 }
 
 .usecase-card h3 {

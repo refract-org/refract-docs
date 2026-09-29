@@ -63,6 +63,25 @@ describe("docs claim audit e2e", () => {
 		expect(missingPages).toEqual([]);
 	});
 
+	it("renders every pipe table as a table, not as pipe text", async () => {
+		// A delimiter row with more cells than its header row (|---|---|---|---|
+		// under three headings) is not a GFM table, so the page prints the
+		// whole table as a paragraph of pipes.
+		const delimiterRow = /^\s*\|?\s*:?-+:?\s*(?:\|\s*:?-+:?\s*)+\|?\s*$/m;
+		const pagesWithPipeText: string[] = [];
+		for (const filePath of await findMarkdownFiles(DOCS_DIR)) {
+			const slug = slugForDoc(filePath);
+			const html = await readFile(renderedPathForSlug(slug), "utf-8");
+			for (const [, paragraph] of html.matchAll(/<p>([\s\S]*?)<\/p>/g)) {
+				if (delimiterRow.test(paragraph)) {
+					pagesWithPipeText.push(`${slug}: ${paragraph.split("\n")[0]}`);
+				}
+			}
+		}
+
+		expect(pagesWithPipeText).toEqual([]);
+	});
+
 	it("keeps the search index in sync with rendered documentation pages", async () => {
 		const markdownSlugs = (await findMarkdownFiles(DOCS_DIR))
 			.map((filePath) => slugForDoc(filePath))

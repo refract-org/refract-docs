@@ -23,7 +23,7 @@ refract analyze [page] [options]
 ```
 
 | Flag | Default | Description |
-|---|---|---|---|
+|---|---|---|
 | `page` | required (positional) | Page title |
 | `-d, --depth <d>` | `detailed` | Analysis depth: `brief`, `detailed`, `forensic`. See [depth levels](depth.md). |
 | `--from <revId>` | — | Start revision ID |
@@ -180,7 +180,7 @@ refract export <page> [options]
 ```
 
 | Flag | Default | Description |
-|---|---|---|---|
+|---|---|---|
 | `page` | required (positional) | Page title |
 | `-f, --format <fmt>` | `json` | Output format: `json`, `csv`, `ndjson`, `html`, `parquet` |
 | `--bundle` | off | Export as evidence bundle with a SHA-256 hash of its contents (not signed). See [bundle format](bundle-manifest.md). |
@@ -244,7 +244,7 @@ refract explore <page> [options]
 ```
 
 | Flag | Default | Description |
-|---|---|---|---|
+|---|---|---|
 | `page` | required (positional) | Page title |
 | `-p, --port <n>` | `8899` | Server port |
 | `--no-open` | off | Don't open browser automatically |

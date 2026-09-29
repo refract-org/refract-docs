@@ -539,6 +539,12 @@ async function build() {
 		const t = title ? ` title="${title}"` : "";
 		return `<img src="${h}" alt="${text}"${t}>`;
 	};
+	// A table wider than the column scrolls inside this box, so a narrow
+	// screen never has to scroll the whole page sideways to read it.
+	const renderTable = renderer.table;
+	renderer.table = function (token) {
+		return `<div class="table-scroll">${renderTable.call(this, token)}</div>\n`;
+	};
 	renderer.heading = function ({ tokens, depth }) {
 		const text = this.parser.parseInline(tokens);
 		const baseSlug = slugifyHeading(plainText(tokens));

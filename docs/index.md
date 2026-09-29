@@ -91,7 +91,6 @@ refract analyze "Earth" --report > earth-report.json
 
 <div class="usecase-grid">
   <div class="usecase-card">
-    <div class="usecase-badge">Research</div>
     <h3>Journalist / Researcher</h3>
     <p>Trace claim evolution and sources across revision history.</p>
     <div class="usecase-steps">
@@ -99,7 +98,6 @@ refract analyze "Earth" --report > earth-report.json
     </div>
   </div>
   <div class="usecase-card">
-    <div class="usecase-badge">Data Science</div>
     <h3>Data scientist / OSINT</h3>
     <p>Extract NDJSON events and run columnar SQL analysis in DuckDB.</p>
     <div class="usecase-steps">
@@ -107,7 +105,6 @@ refract analyze "Earth" --report > earth-report.json
     </div>
   </div>
   <div class="usecase-card">
-    <div class="usecase-badge">Engineering</div>
     <h3>ML / RAG engineer</h3>
     <p>Score retrieved texts by stability and provenance quality indicators.</p>
     <div class="usecase-steps">
@@ -115,7 +112,6 @@ refract analyze "Earth" --report > earth-report.json
     </div>
   </div>
   <div class="usecase-card">
-    <div class="usecase-badge">Automation</div>
     <h3>Policy / Compliance</h3>
     <p>Re-check pages on a schedule and send Slack, email or webhook notifications.</p>
     <div class="usecase-steps">
@@ -123,7 +119,6 @@ refract analyze "Earth" --report > earth-report.json
     </div>
   </div>
   <div class="usecase-card">
-    <div class="usecase-badge">Agents</div>
     <h3>AI agent developer</h3>
     <p>Give agents Refract's tools through the built-in MCP server.</p>
     <div class="usecase-steps">
@@ -131,7 +126,6 @@ refract analyze "Earth" --report > earth-report.json
     </div>
   </div>
   <div class="usecase-card">
-    <div class="usecase-badge">Evaluation</div>
     <h3>AI model evaluator</h3>
     <p>Test for temporal leakage and recency cutoffs against revision histories.</p>
     <div class="usecase-steps">
@@ -164,50 +158,9 @@ Tutorials, and a longer list of use cases, built on the event stream:
 
 | Capability | Read |
 |---|---|
-| **Temporal leakage & recency** | [Model evaluation tutorial](tutorials/model-evaluation.md) — Test models against knowledge cutoffs and compare their recency. |
-| **Provenance-aware RAG** | [RAG provenance tutorial](tutorials/rag-provenance.md) — Score claims by stability. Filter training data. Weight retrieval by source quality. |
-| **BYO-inference at every boundary** | [BYO-inference tutorial](tutorials/byo-inference.md) — Replace heuristics with LLMs. Audit which path was taken. |
 | **Claim-level search** | [Frontier use cases](frontier-use-cases.md) — Search claim histories, not documents. "Claims removed as unsourced." "Claims that softened after events." |
-| **Temporal leakage detection** | [Frontier use cases](frontier-use-cases.md#ai-evaluation--temporal-leakage-detection) — Was this claim public before the model's knowledge cutoff? |
 | **LLM summarization** | [Summarization tutorial](tutorials/summarization.md) — Pipe events through any model. Get human-readable change reports with audit trail. |
 | **Non-Wikipedia sources** | [Custom adapter tutorial](tutorials/custom-adapter.md) — Confluence, GitHub wikis, Notion. Same analyzers, different data. |
-| **Streaming and Parquet** | [Frontier use cases](frontier-use-cases.md) — Live ingestion, columnar export, HuggingFace datasets. |
-
-## Contents
-
-### Getting started
-- [Why Refract](why-refract.md) — [Compare to alternatives](compare.md)
-- [Install](install.md) — [Concepts](concepts.md)
-- [Common events](quickstart-events.md) — [Complete workflow](complete-workflow.md)
-
-### Reference
-- [CLI command reference](cli.md) — [SDK / package reference](sdk.md)
-- [Event schema](schema.md) — [Event taxonomy](events.md)
-- [Analysis depth levels](depth.md) — [Export formats](bundle-manifest.md)
-- [Evaluation harness](eval.md) — [Architecture decisions](architecture-decisions.md)
-
-### Integration
-- [Integrations overview](integrations.md) — all supported tools and patterns
-- [Downstream integration](downstream.md) — [MCP: AI agent integration](mcp.md)
-- [Analytics with DuckDB](analytics.md) — [Notebook analysis](notebooks.md)
-- [Scheduled monitoring](cron.md)
-
-### Tutorials
-- [Wikipedia history](tutorials/wikipedia-history.md) — [Fandom canon](tutorials/fandom-canon.md)
-- [Citation churn](tutorials/citation-churn.md) — [Dispute timeline](tutorials/dispute-timeline.md)
-- [Cross-wiki comparison](tutorials/cross-wiki-diff.md) — [Combat revisionism](tutorials/combating-revisionism.md)
-- [RAG provenance](tutorials/rag-provenance.md) — [MCP agent](tutorials/mcp-agent.md)
-- [Scheduled monitoring](tutorials/scheduled-monitoring.md) — [Python SDK](tutorials/python-sdk.md)
-- [BYO-inference](tutorials/byo-inference.md) — [Custom analyzer](tutorials/custom-analyzer.md)
-- [Custom eval labels](tutorials/custom-eval.md) — [Private wikis](tutorials/private-wiki.md)
-- [Non-English wikis](tutorials/non-english.md) — [Summarization](tutorials/summarization.md)
-- [Refract UI](tutorials/refract-ui.md) — [Custom adapter](tutorials/custom-adapter.md) — [Model evaluation](tutorials/model-evaluation.md)
-
-### Appendix
-- [Glossary](glossary.md) — [Troubleshooting / FAQ](faq.md)
-- [Interpreting output](interpretation.md) — [Security](security.md)
-- [Naming conventions](naming.md) — [Boundary](boundary.md)
-- [Contributing to docs](contributing-docs.md)
 
 ## License
 
