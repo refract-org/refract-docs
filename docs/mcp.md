@@ -21,11 +21,6 @@ package a client configuration names. `@refract-org/mcp` is a library with no
 executable, and the unscoped npm package `refract` is an unrelated project —
 `npx refract mcp` runs someone else's code.
 
-> **npm status, 2026-09-24:** `@refract-org/cli@0.5.7`, the newest release on npm,
-> does not start. Until the next release is published, point the client at a
-> [source build](install.md#from-source):
-> `"command": "node", "args": ["/path/to/refract/packages/cli/dist/src/cli.js", "mcp"]`.
-
 ### Claude Code
 
 ```json

@@ -41,10 +41,6 @@ baseline and reports none. `--cache-dir` is where `cron` keeps each page's previ
 observation; without it, `~/.wikihistory`. The [cron reference](../cron.md) describes
 the comparison, the output and the exit code.
 
-> `refract cron` reports new events from the next CLI release onward: up to 0.5.7 it
-> compared each run against itself and reported zero. npm's 0.5.7 does not start at
-> all — [build from source](../install.md#from-source) until the release is out.
-
 ## Step 3: Schedule it
 
 Add to your crontab, with the interval matching the schedule:
@@ -131,8 +127,7 @@ refract watch "COVID-19" | while read -r line; do
 done
 ```
 
-`watch` polls until stopped (from the next release; up to 0.5.7 it exited after its
-first poll).
+`watch` polls until stopped.
 
 ## Step 6: Get the events themselves
 

@@ -5,13 +5,6 @@ events are new since the previous run. It is built to be started by a scheduler 
 system cron, a CI workflow, a job runner — and to exit. It keeps its own state between
 runs, so the scheduler has to keep that state too (see [where state lives](#where-state-lives)).
 
-> **Needs the next CLI release.** Up to 0.5.7, `refract cron` compared each run
-> against the observation that analysis had just overwritten, so it reported zero
-> new events on every run; with `--cache-dir` it reported "baseline established"
-> forever. The fix (refract-org/refract#23) ships with the next release, and npm's
-> 0.5.7 does not start at all — see [installation](install.md). This page describes
-> the fixed behavior.
-
 ## Basic usage
 
 ```bash

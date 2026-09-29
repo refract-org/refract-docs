@@ -15,15 +15,8 @@ npm install -g @refract-org/cli
 ```
 
 `npx @refract-org/cli` is used as a fallback if `refract` is not on PATH.
-
-Until the next CLI release reaches npm (0.5.7 does not start — see
-[installation](install.md)), point the SDK at a [source build](install.md#from-source):
-
-```python
-from refract import Refract
-
-r = Refract(binary="/path/to/refract/packages/cli/dist/src/cli.js")  # run with node
-```
+`Refract(binary=...)` takes the path to a particular CLI instead; a path ending in
+`.js` is run with `node`.
 
 ## Quick start
 

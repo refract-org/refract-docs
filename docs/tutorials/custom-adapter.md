@@ -70,7 +70,7 @@ async function fetchFromConfluence(
 // Use it exactly like the Wikipedia client
 const revisions = await fetchFromConfluence("12345", "https://mycompany.atlassian.net/wiki", "token");
 // The events `refract analyze` derives from each pair of revisions
-// (@refract-org/analyzers 0.5.1+, the next release).
+// (@refract-org/analyzers 0.5.1+).
 const events = annotateEvents(buildRevisionEvents(revisions));
 
 console.log(`Found ${events.length} events across ${revisions.length} revisions`);

@@ -30,7 +30,7 @@ refract analyze [page] [options]
 | `--to <revId>` | — | End revision ID |
 | `--since <ts>` | — | Analyze revisions from this ISO timestamp. The first revision in the window is not diffed against the one before it. |
 | `-j, --json` | off | Print events as JSON, one per line (NDJSON), instead of the interactive view |
-| `--brief-limit <n>` | `20` | Revisions read at `brief` depth: the latest N (the oldest N up to 0.5.7) |
+| `--brief-limit <n>` | `20` | Revisions read at `brief` depth: the latest N |
 | `-c, --cache` | off | Cache revisions in SQLite (`~/.wikihistory/refract.db`). Needs Bun and `@refract-org/persistence`, which is only available from a source checkout. |
 | `--pages-file <path>` | — | Batch file of page titles (one per line). Prints a total, not the events. |
 | `--batch-concurrency <n>` | `4` | Pages analyzed at once with `--pages-file` |
@@ -57,7 +57,7 @@ refract claim <page> [options]
 |---|---|---|
 | `page` | required (positional) | Page title |
 | `-t, --text <text>` | required | Claim text to track |
-| `--limit <n>` | `50` | Revisions read: the latest N (the oldest N up to 0.5.7) |
+| `--limit <n>` | `50` | Revisions read: the latest N |
 | `-c, --cache` | off | Cache revisions in SQLite |
 | `--api <url>` | `en.wikipedia.org` | MediaWiki API base URL |
 
@@ -335,7 +335,7 @@ These options apply to most commands:
 | `--api-password <pass>` | Password for basic auth |
 
 Client-credential headers (`X-OAuth-Client-Id`, `X-OAuth-Client-Secret`) come from the
-`REFRACT_OAUTH_CLIENT_ID` and `REFRACT_OAUTH_CLIENT_SECRET` environment variables from
-the next release. Up to 0.5.7 they were read from `OAUTH_CLIENT_ID` and
+`REFRACT_OAUTH_CLIENT_ID` and `REFRACT_OAUTH_CLIENT_SECRET` environment variables
+(0.5.17+). Up to 0.5.7 they were read from `OAUTH_CLIENT_ID` and
 `OAUTH_CLIENT_SECRET` and sent to whatever wiki was queried, Wikipedia included; do
 not set those names for Refract.
