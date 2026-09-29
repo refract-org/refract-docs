@@ -196,7 +196,7 @@ empty.
 
 ## `refract verify`
 
-Check a verification bundle's manifest hash, Merkle root and inclusion proofs, and optionally write the result as an HTML file. It does not rehash the events, and nothing in a bundle is signed; see [what it checks](bundle-manifest.md#checking-a-bundle).
+Check a verification bundle's events, manifest hash, Merkle root and inclusion proofs, and optionally write the result as an HTML file. It rehashes each event and checks each proof against the manifest's root, which 0.5.17 and earlier did not. Nothing in a bundle is signed; see [what it checks](bundle-manifest.md#checking-a-bundle).
 
 ```bash
 refract verify <bundle.json> [options]

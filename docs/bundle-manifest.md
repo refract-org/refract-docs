@@ -95,10 +95,12 @@ refract verify earth-proof.json
 refract verify earth-proof.json --html receipt.html
 ```
 
-It recomputes the manifest hash, recomputes the Merkle root from the manifest's event hashes, checks that there is one event per hash, and checks that each proof hashes up to the root it records. It exits 1 if any check fails. `receipt.html` is a single HTML file with the result, the manifest's hashes, and a row per event.
+It recomputes the manifest hash and recomputes the Merkle root from the manifest's event hashes. It rehashes each event the way the export did and compares the result with the hash listed at the event's index; if an event carries an `eventId`, its content must hash to that ID. It checks that each listed hash has one proof, for that hash and index, that hashes up to the manifest's Merkle root. It reports each failure with its index and exits 1 if any check fails. `receipt.html` is a single HTML file with the result, the manifest's hashes, and a row per event showing its hash check and its proof check.
+
+Up to 0.5.17, `verify` did not rehash the events or compare a proof's root with the manifest's, so a bundle with an edited event, a missing proof, or a proof ending at another root passed.
 
 What it does not check:
 
-- The events. It does not rehash them, so an edited event passes. To check them, recompute each event's `createEventIdentity` (`@refract-org/evidence-graph`) and compare it with `manifest.outputEventHashes`.
-- That a proof's root is the manifest's root, or that every event has a proof.
+- Event fields outside the event hash: `layer`, `claimId`, `schemaVersion`, the semantic enrichment fields (`editMagnitude`, `contentChange`, `keyTerms`, `certaintyProfile`, `directionSignal`, `quantitativeFindings`), each fact's `provenance` and `sourceSpan`, and `modelInterpretation`. Edits to them pass.
+- That the events are what Refract derives from the page's revisions. The bundle holds only the revisions' hashes.
 - Who made the bundle. Nothing in it is signed, and anyone who edits it can recompute every hash. A pass shows the bundle is internally consistent. To detect edits, compare its Merkle root with one you received separately, or re-run the same Refract version over the same revision range and compare roots.
