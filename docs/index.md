@@ -91,7 +91,6 @@ refract analyze "Earth" --report > earth-report.json
 
 <div class="usecase-grid">
   <div class="usecase-card">
-    <div class="usecase-badge">Research</div>
     <h3>Journalist / Researcher</h3>
     <p>Trace claim evolution and sources across revision history.</p>
     <div class="usecase-steps">
@@ -99,7 +98,6 @@ refract analyze "Earth" --report > earth-report.json
     </div>
   </div>
   <div class="usecase-card">
-    <div class="usecase-badge">Data Science</div>
     <h3>Data scientist / OSINT</h3>
     <p>Extract NDJSON events and run columnar SQL analysis in DuckDB.</p>
     <div class="usecase-steps">
@@ -107,7 +105,6 @@ refract analyze "Earth" --report > earth-report.json
     </div>
   </div>
   <div class="usecase-card">
-    <div class="usecase-badge">Engineering</div>
     <h3>ML / RAG engineer</h3>
     <p>Score retrieved texts by stability and provenance quality indicators.</p>
     <div class="usecase-steps">
@@ -115,7 +112,6 @@ refract analyze "Earth" --report > earth-report.json
     </div>
   </div>
   <div class="usecase-card">
-    <div class="usecase-badge">Automation</div>
     <h3>Policy / Compliance</h3>
     <p>Re-check pages on a schedule and send Slack, email or webhook notifications.</p>
     <div class="usecase-steps">
@@ -123,7 +119,6 @@ refract analyze "Earth" --report > earth-report.json
     </div>
   </div>
   <div class="usecase-card">
-    <div class="usecase-badge">Agents</div>
     <h3>AI agent developer</h3>
     <p>Give agents Refract's tools through the built-in MCP server.</p>
     <div class="usecase-steps">
@@ -131,7 +126,6 @@ refract analyze "Earth" --report > earth-report.json
     </div>
   </div>
   <div class="usecase-card">
-    <div class="usecase-badge">Evaluation</div>
     <h3>AI model evaluator</h3>
     <p>Test for temporal leakage and recency cutoffs against revision histories.</p>
     <div class="usecase-steps">

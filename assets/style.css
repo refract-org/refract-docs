@@ -862,19 +862,6 @@ body {
 	min-height: 100%;
 }
 
-.usecase-badge {
-	align-self: flex-start;
-	background: var(--accent-soft);
-	color: var(--accent);
-	font-size: 0.65rem;
-	font-weight: 700;
-	text-transform: uppercase;
-	letter-spacing: 0.05em;
-	padding: 2px 8px;
-	border-radius: 20px;
-	margin-bottom: 0.75rem;
-}
-
 .usecase-card h3 {
 	font-family: var(--font-heading);
 	font-size: 1.05rem;
