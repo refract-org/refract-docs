@@ -95,7 +95,7 @@ refract export "Earth" --format ndjson > earth-events.jsonl
 # CSV for spreadsheets
 refract export "Earth" --format csv > earth-events.csv
 
-# Bundle with SHA-256 verification
+# Bundle with a SHA-256 hash of its contents
 refract export "Earth" --bundle > earth-bundle.json
 ```
 

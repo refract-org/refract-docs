@@ -22,7 +22,7 @@
   <rect width="760" height="620" fill="#fafbfc" rx="8"/>
 
   <text x="380" y="36" text-anchor="middle" class="title">Merkle Tree Verification</text>
-  <text x="380" y="56" text-anchor="middle" class="subtitle">How --bundle and --manifest provide integrity verification for evidence events</text>
+  <text x="380" y="56" text-anchor="middle" class="subtitle">How a replay manifest (--manifest) lets a consumer check the events it received</text>
 
   <!-- LEFT: Building the tree -->
   <rect x="30" y="80" width="340" height="24" rx="4" fill="#dbeafe"/>
@@ -118,16 +118,16 @@
   <rect x="30" y="355" width="700" height="250" rx="8" fill="#f9fafb" stroke="#e5e7eb" stroke-width="1"/>
   <text x="60" y="378" font-size="11" font-weight="700" fill="#374151">How it works</text>
 
-  <text x="60" y="400" font-size="10" fill="#6b7280">1. Each EvidenceEvent is hashed with SHA-256 (excluding modelInterpretation) → leaf hash</text>
+  <text x="60" y="400" font-size="10" fill="#6b7280">1. Each event's identity fields are hashed with SHA-256, truncated to 16 hex characters → leaf hash</text>
   <text x="60" y="418" font-size="10" fill="#6b7280">2. Pairs of hashes are concatenated and re-hashed → internal nodes</text>
   <text x="60" y="436" font-size="10" fill="#6b7280">3. Internal nodes are paired and re-hashed recursively → merkleRoot</text>
   <text x="60" y="454" font-size="10" fill="#6b7280">4. The root hash is recorded in the ObservationReport or replay manifest</text>
   <text x="60" y="478" font-size="10" fill="#6b7280">5. A consumer re-hashes the events they received → computed root</text>
-  <text x="60" y="496" font-size="10" fill="#6b7280">6. If computed_root == stored_root → events are unmodified since observation</text>
+  <text x="60" y="496" font-size="10" fill="#6b7280">6. If computed_root == stored_root → the events match those the stored root was computed from</text>
   <text x="60" y="514" font-size="10" fill="#6b7280">7. Merkle proofs can verify a single event without the full dataset</text>
 
   <text x="60" y="544" font-size="10" fill="#374151" font-weight="600">Used for:</text>
-  <text x="60" y="562" font-size="10" fill="#6b7280">— Signed evidence bundles (--bundle): submit evidence to a third party, archive for later verification</text>
+  <text x="60" y="562" font-size="10" fill="#6b7280">— Verification bundles (--proof): the manifest, its events and a Merkle proof per event hash</text>
   <text x="60" y="580" font-size="10" fill="#6b7280">— Replay manifests (--manifest): lightweight integrity check without re-downloading all events</text>
-  <text x="60" y="598" font-size="10" fill="#6b7280">— Chain-of-custody: ObservationReport.merkleRoot proves events match the observation</text>
+  <text x="60" y="598" font-size="10" fill="#6b7280">— ObservationReport.merkleRoot (analyze --report): the same root, carried in the report</text>
 </svg>

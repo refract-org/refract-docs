@@ -120,7 +120,7 @@ class EvidenceEvent:
 
 ### pandas & polars
 
-Methods accept `as_frame=True` for a pandas DataFrame, or `as_polars=True` for a high-performance polars DataFrame with flattened provenance fields:
+`analyze` and `export` (NDJSON format) accept `as_frame=True` for a pandas DataFrame or `as_polars=True` for a polars DataFrame, one row per event with flattened provenance fields:
 
 ```python
 # pandas
@@ -131,9 +131,9 @@ df_polars = r.analyze("Bitcoin", depth="forensic", as_polars=True)
 print(df_polars.group_by("event_type").len())
 ```
 
-### Survival & Duration Analysis (`compute_survival_records`)
+### Sentence survival (`compute_survival_records`)
 
-For empirical studies measuring claim persistence, qualifier erosion, or institutional lag duration:
+How long each sentence stayed on the page. A span starts at `sentence_first_seen` or `sentence_reintroduced` and ends at `sentence_removed`, matched on section and the first 60 characters of the sentence. A sentence still present at the end is right-censored (`event_observed` 0, no end time):
 
 ```python
 from refract import compute_survival_records
@@ -141,11 +141,11 @@ from refract import compute_survival_records
 events = r.analyze("Quantum_computing", depth="detailed")
 survival_data = compute_survival_records(events)
 
-# Returns structured duration records with right-censoring flags:
+# One record per span:
 # [
 #   {
-#     "statement_key": "Lead::Quantum computers use superposition...",
-#     "section": "Lead",
+#     "statement_key": "(lead)::Quantum computers use superposition...",
+#     "section": "(lead)",
 #     "start_time": "2020-01-01T00:00:00Z",
 #     "end_time": "2022-06-15T00:00:00Z",
 #     "duration_days": 896.0,
@@ -157,12 +157,12 @@ survival_data = compute_survival_records(events)
 
 ### NetworkX (`to_networkx`)
 
-Export citation references and revision transitions into a directed graph for network analysis, community detection, or centrality calculations:
+A directed graph of revision transitions: a node per revision (`rev:<id>`) and an edge from each event's `fromRevisionId` to its `toRevisionId`, carrying that event's `eventType` and `timestamp` (a later event on the same pair overwrites them). It also adds a `cites` edge from a revision to any fact detail containing `url=`. No analyzer emits a citation URL as a fact, but at `forensic` depth the `full_wikitext_before`/`full_wikitext_after` facts contain `url=` whenever the page cites a web source, and each becomes a node holding a revision's whole wikitext, so build the graph from `brief` or `detailed` events:
 
 ```python
 from refract import to_networkx
 
-events = r.analyze("Artificial_intelligence", depth="forensic")
+events = r.analyze("Artificial_intelligence", depth="detailed")
 G = to_networkx(events)
 
 import networkx as nx

@@ -276,32 +276,27 @@ Apply the same engine to contracts, policies, and versioned legal documents.
 
 Detect: obligations added or narrowed, warranties softened, termination rights expanded, indemnity strengthened, compliance requirements removed.
 
-### Forensic Policy & Legislative Propagation
+Example shifts: shall → may, all damages → direct damages, must notify within 24 hours → must notify without undue delay.
 
-Track text reuse, copied boilerplate, and model legislation across decentralized authorities.
+### Policy and Legislative Text Reuse
 
-Refract's `detectTextPropagation` analyzer extracts token-level n-gram shingles and contiguous borrowed spans across revisions:
-- Pinpoint identical statutory or regulatory clauses transplanted between jurisdictions.
-- Measure borrowed language percentage and origin revision timestamps.
-- Distinguish original agency findings from external lobbying or model text.
+Track copied boilerplate and model legislation across jurisdictions.
 
-### Citation Network Concentration & Echo Chambers
+`detectTextPropagation(source, target)` compares two texts you supply: the Jaccard similarity of their 5-token shingles, the verbatim spans of 8 or more tokens they share, and a flag when similarity reaches 0.15 or the shared spans total 16 tokens. It does not find candidate sources or say which text came first.
+- Find clauses copied verbatim from one jurisdiction's text into another's.
+- Measure how much of a bill's text it shares with a model bill.
 
-Analyze the structural diversity of an article or document's evidentiary base.
+### Citation Concentration
 
-Refract's `analyzeCitationNetwork` calculates domain-level Herfindahl-Hirschman concentration (HHI) and network diversity metrics:
-- Detect circular citation loops between allied publications.
-- Flag high-concentration pages where contentious claims rely overwhelmingly on a single domain.
-- Surface when a diversity drop precedes narrative contestation or reverts.
+`analyzeCitationNetwork(citations)` counts a page's citations per domain and per source and computes a Herfindahl-Hirschman index over the domain shares, flagging concentration above 0.4 when there are at least three citations.
+- Flag pages where most citations come from one domain.
+- Run it on each revision's citations to see when a page's sourcing narrowed.
 
-### Cryptographic Evidentiary Verification
+### Verification Bundles
 
-Generate portable, model-free proof of knowledge change for litigation and journalism.
-
-Refract's verification bundles (`refract export --proof` and `refract verify`) wrap replay manifests, events, and Merkle inclusion proofs:
-- Produce standalone, tamper-evident HTML audit receipts.
-- Cryptographically verify individual event inclusion against root hashes without transmitting entire raw corpora.
-- Establish an unassailable provenance chain for court submissions and investigative reporting.
+`refract export --proof` writes a replay manifest, its events and a Merkle inclusion proof per event hash to one JSON file. `refract verify` checks the manifest hash, the Merkle root and each proof, and `--html` writes the result as an HTML file.
+- Publish a Merkle root; anyone who runs the same Refract version over the same revision range gets the same root.
+- Nothing in a bundle is signed, and `verify` does not rehash the events: a pass shows the bundle is internally consistent, not who made it. See [what it checks](bundle-manifest.md#checking-a-bundle).
 
 ---
 
