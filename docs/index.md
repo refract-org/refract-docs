@@ -6,8 +6,6 @@
 npx @refract-org/cli analyze "Earth" --depth brief
 ```
 
-> The CLI on npm (0.5.7) does not start; until the next release, [build from source](install.md#from-source). The library packages install normally.
-
 <div class="hero-links">
   <a href="demo/" class="button primary">Demo</a>
   <a href="quickstart/" class="button secondary">Quick start</a>

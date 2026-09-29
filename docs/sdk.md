@@ -6,11 +6,11 @@ Refract's SDK is a set of packages that compose into a pipeline: ingest → anal
 
 ![Package dependency graph](packages.svg)
 
-Packages are published on npm under the `@refract-org` scope. All packages are ESM-only and written in TypeScript.
+Packages are published on npm under the `@refract-org` scope, except `@refract-org/persistence`. All packages are ESM-only and written in TypeScript.
 
 ## Basic pipeline
 
-The events `refract analyze` produces, from revisions you fetch yourself. `buildRevisionEvents` and `annotateEvents` arrive in `@refract-org/analyzers` 0.5.1, the next release; npm has 0.5.0, so until then build from source (see [installation](./install)).
+The events `refract analyze` produces, from revisions you fetch yourself. `buildRevisionEvents` and `annotateEvents` need `@refract-org/analyzers` 0.5.1 or later.
 
 ```typescript
 import { MediaWikiClient } from "@refract-org/ingestion";
@@ -29,6 +29,8 @@ for (const event of events) event.eventId = createEventIdentity(event);
 `annotateEvents` adds `schemaVersion` and the semantic fields the CLI's output carries (`certaintyProfile`, `directionSignal`, `quantitativeFindings` and others). `buildRevisionEvents` takes `depth` (`"brief"`, `"detailed"`, `"forensic"`), `similarityThreshold` and the page's `protectionLogs`. It reads no network and no filesystem, so it runs in a Worker too (with `nodejs_compat`). For page moves and talk-page correlation as well, follow the recipe in the [analyzers README](https://github.com/refract-org/refract/tree/main/packages/analyzers#event-pipeline-051).
 
 ## Storage
+
+`@refract-org/persistence` is not on npm: import it from a source checkout, under Bun.
 
 ```typescript
 import { Persistence } from "@refract-org/persistence";
@@ -187,7 +189,7 @@ Key exports:
 
 ### `@refract-org/cli`
 
-The `refract` / `wikihistory` CLI tool (16 commands: analyze, claim, classify, cron, delegation, diff, eval, explore, export, init, mcp, snapshot, stream, verify, visualize, watch). See [CLI reference](./cli). The release on npm (0.5.7) does not start; see [installation](./install).
+The `refract` / `wikihistory` CLI tool (16 commands: analyze, claim, classify, cron, delegation, diff, eval, explore, export, init, mcp, snapshot, stream, verify, visualize, watch). See [CLI reference](./cli).
 
 ### `@refract-org/persistence`
 

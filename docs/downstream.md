@@ -26,7 +26,7 @@ const events = annotateEvents(buildRevisionEvents(revisions));
 for (const event of events) event.eventId = createEventIdentity(event);
 ```
 
-These are the events the CLI derives from each pair of revisions, from the same code: the CLI calls `buildRevisionEvents` too. Both functions arrive in `@refract-org/analyzers` 0.5.1, the next release. Before it, a consumer had to copy the CLI's diff code, and a copy drifts: import the export rather than keeping one. See the [SDK reference](sdk.md#basic-pipeline).
+These are the events the CLI derives from each pair of revisions, from the same code: the CLI calls `buildRevisionEvents` too. Both functions are exported from `@refract-org/analyzers` 0.5.1 on. Before it, a consumer had to copy the CLI's diff code, and a copy drifts: import the export rather than keeping one. See the [SDK reference](sdk.md#basic-pipeline).
 
 ### 3. FactProvenance for auditability
 
