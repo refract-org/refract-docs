@@ -5,8 +5,10 @@
 		"slug": null,
 		"children": [
 			{ "title": "Why Refract", "slug": "why-refract" },
+			{ "title": "Compare to alternatives", "slug": "compare" },
 			{ "title": "Demo", "slug": "demo" },
 			{ "title": "Quick start", "slug": "quickstart" },
+			{ "title": "Common events", "slug": "quickstart-events" },
 			{ "title": "Complete workflow", "slug": "complete-workflow" },
 			{ "title": "Install", "slug": "install" },
 			{ "title": "Concepts", "slug": "concepts" }
@@ -31,6 +33,7 @@
 		"title": "Integration",
 		"slug": null,
 		"children": [
+			{ "title": "Integrations overview", "slug": "integrations" },
 			{ "title": "Downstream integration", "slug": "downstream" },
 			{ "title": "MCP / AI agents", "slug": "mcp" },
 			{ "title": "Python SDK", "slug": "python-sdk" },
@@ -49,7 +52,26 @@
 			{ "title": "Citation churn", "slug": "tutorials/citation-churn" },
 			{ "title": "Dispute timeline", "slug": "tutorials/dispute-timeline" },
 			{ "title": "Cross-wiki diff", "slug": "tutorials/cross-wiki-diff" },
-			{ "title": "Refract UI", "slug": "tutorials/refract-ui" }
+			{ "title": "Refract UI", "slug": "tutorials/refract-ui" },
+			{
+				"title": "Combat revisionism",
+				"slug": "tutorials/combating-revisionism"
+			},
+			{ "title": "RAG provenance", "slug": "tutorials/rag-provenance" },
+			{ "title": "MCP agent", "slug": "tutorials/mcp-agent" },
+			{
+				"title": "Scheduled monitoring",
+				"slug": "tutorials/scheduled-monitoring"
+			},
+			{ "title": "Python SDK notebook", "slug": "tutorials/python-sdk" },
+			{ "title": "BYO-inference", "slug": "tutorials/byo-inference" },
+			{ "title": "Custom analyzer", "slug": "tutorials/custom-analyzer" },
+			{ "title": "Custom eval labels", "slug": "tutorials/custom-eval" },
+			{ "title": "Private wikis", "slug": "tutorials/private-wiki" },
+			{ "title": "Non-English wikis", "slug": "tutorials/non-english" },
+			{ "title": "Summarization", "slug": "tutorials/summarization" },
+			{ "title": "Custom adapter", "slug": "tutorials/custom-adapter" },
+			{ "title": "Model evaluation", "slug": "tutorials/model-evaluation" }
 		]
 	},
 	{
