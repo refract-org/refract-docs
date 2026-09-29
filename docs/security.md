@@ -32,7 +32,7 @@ When using `--cache`, revision content is persisted to `~/.wikihistory/refract.d
 
 Refract makes outbound HTTPS requests to the configured MediaWiki API. Authentication tokens are sent as `Authorization` or `x-api-key` headers. All traffic is encrypted in transit.
 
-Bundled evidence files (`--bundle`) are signed but not encrypted — they contain plaintext event data with a SHA-256 hash for integrity verification.
+Bundled evidence files (`--bundle`) are neither signed nor encrypted — they contain plaintext event data and a SHA-256 hash of their contents, which anyone who edits the file can recompute.
 
 ## Data retention
 

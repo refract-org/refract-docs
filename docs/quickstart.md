@@ -54,7 +54,7 @@ Opens a local web server (default port 8899) with a timeline view, evidence tabl
 refract export "Earth" --format ndjson > earth-events.jsonl
 ```
 
-Use `refract export` to format output as json, csv, ndjson, html, parquet, a signed bundle (`--bundle`), or a replay manifest (`--manifest`). Add `--flatten` to produce flat column-oriented CSV suitable for analytical tools.
+Use `refract export` to format output as json, csv, ndjson, html, parquet, an evidence bundle with a SHA-256 hash (`--bundle`), or a replay manifest (`--manifest`). Add `--flatten` to produce flat column-oriented CSV suitable for analytical tools.
 
 ## Try it: trace a claim
 

@@ -3,15 +3,15 @@
 ## Goal
 
 Use Refract to detect revisionist edits — claim laundering, citation swapping,
-coordinated rewrites — and produce a cryptographic audit trail that anyone
-can reproduce independently. No trust required.
+coordinated rewrites — and produce an event record, with a Merkle root, that
+anyone can reproduce by running the same analysis.
 
 ## What Refract gives historians that Wikipedia's UI doesn't
 
 Wikipedia's page history shows you diffs. Refract shows you patterns across diffs:
 which claims survived, which sources got swapped, whether edits were debated or
-silent, whether two wikis tell different stories, and a Merkle root proving you
-ran this analysis when you said you did.
+silent, whether two wikis tell different stories, and a Merkle root that anyone
+re-running the analysis can reproduce.
 
 Revisionism works by making the old version disappear. Refract makes the
 disappearance visible as a structured, queryable event. Every change becomes a
@@ -117,16 +117,17 @@ refract analyze "Topic" --api https://de.wikipedia.org/w/api.php > wiki-de.jsonl
 
 Or use `refract diff` for structured cross-wiki comparison with z-score outlier detection.
 
-## Step 6: Merkle-provable bundles — the audit trail
+## Step 6: A Merkle root others can reproduce
 
 ```bash
-refract export "Battle of X" --bundle > battle-bundle.json
+refract export "Battle of X" --manifest --from 1270000000 --to 1280110100 > battle-manifest.json
 ```
 
-The bundle contains every event, a Merkle root, the schema version, and the
-analyzer configuration. A skeptic runs the same command and gets an identical
-Merkle root — or a different one if the page has changed. The historian provides
-a cryptographic receipt, not a screenshot.
+The manifest lists a SHA-256 hash of each input revision, a hash of each event,
+the Merkle root over the event hashes, and the Refract version. A skeptic who
+runs the same version over the same revision range gets the same Merkle root; a
+different root means the events differ. Nothing is signed, so the root shows the
+analysis is reproducible, not who ran it or when.
 
 ## What Refract deliberately does NOT tell you
 

@@ -111,13 +111,13 @@ refract cron pages.txt --interval 24 -c --notify-slack
 
 Re-observe on a schedule. Detect changes since last run. Notify on new events.
 
-### Merkle-verifiable export
+### Hashed export
 
 ```bash
 refract export "Page" --bundle > bundle.json
 ```
 
-Signed bundles with SHA-256 hashes. Downstream systems verify data hasn't been modified since export.
+The bundle carries a SHA-256 hash of its contents. It is not signed: a downstream system that receives the hash separately can check that the file matches it. `--manifest` gives a Merkle root over the event hashes instead.
 
 ## Complementary technologies
 

@@ -92,7 +92,7 @@ refract diff "Darth_Vader" \
 | **Provenance-tagged** — every event records which analyzer, what version, what parameters | Most tools produce output without an audit trail |
 | **26 event types** — sentence lifecycle, citations, templates, reverts, sections, categories, wikilinks, talk pages, edit clusters, protection changes | Most tools track 1–3 signal types |
 | **BYO-inference** — every analyzer threshold is a pluggable function. Defaults work offline. Plug a model where you need one. | Most tools are either all-model or no-model, not selectable per boundary |
-| **Hash-verifiable** — evidence bundles carry a SHA-256 hash, replay manifests a Merkle root | No comparable tool offers cryptographic verification |
+| **Hash-verifiable** — evidence bundles carry a SHA-256 hash, replay manifests a Merkle root | Most tools export no hash to check a copy against |
 | **MCP-native** — AI agents connect via built-in MCP server | Most tools have no AI agent integration |
 
 ## When Refract is not the right tool

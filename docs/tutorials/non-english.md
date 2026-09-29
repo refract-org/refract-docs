@@ -128,5 +128,5 @@ Each wiki's data is stored separately. Use `--cache-dir` to change the cache loc
 
 - [Cross-wiki comparison tutorial](cross-wiki-diff.md) — structured multi-wiki diff
 - [Private wiki tutorial](private-wiki.md) — authenticated MediaWiki instances
-- [Combat revisionism tutorial](combating-revisionism.md) — cryptographic audit trail
+- [Combat revisionism tutorial](combating-revisionism.md) — reproducible event records
 - [Comparison page](../compare.md) — Refract vs other tools
