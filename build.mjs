@@ -16,7 +16,7 @@ const SITE_URL = (
 ).replace(/\/?$/, "/");
 const SITE_NAME = "Refract";
 const SITE_DESCRIPTION =
-	"Refract — the open claim-history layer for public knowledge. Deterministic event stream of claims, sources, and disputes across revision histories.";
+	"A deterministic observation engine for revision histories. It reads a page's edits and emits a typed event for each change.";
 const SOURCE_REPOSITORY = "https://github.com/refract-org/refract";
 
 function assetVersion() {
@@ -250,6 +250,11 @@ function slugifyHeading(text) {
 		.replace(/\s/g, "-");
 }
 
+// A title that already leads with the name doesn't repeat it as a suffix.
+function documentTitle(title) {
+	return title.startsWith(SITE_NAME) ? title : `${title} — ${SITE_NAME}`;
+}
+
 function wrapHTML(title, description, content, currentSlug, headings = []) {
 	let tocHtml = "";
 	if (headings.length > 0) {
@@ -269,7 +274,7 @@ function wrapHTML(title, description, content, currentSlug, headings = []) {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>${title} — Refract</title>
+  <title>${documentTitle(title)}</title>
   <link rel="stylesheet" href="${BASE}style.css?v=${ASSET_VERSION}">
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><style>path{fill:%2307090f}@media (prefers-color-scheme:dark){path{fill:%23e2e4ed}}</style><path d='M8 2 15 14H1z'/></svg>">
   <meta name="description" content="${escapeMarkup(description)}">
@@ -282,7 +287,7 @@ function wrapHTML(title, description, content, currentSlug, headings = []) {
     <aside class="sidebar">
       <div class="sidebar-header">
         <a href="${BASE}" class="brand">Refract</a>
-        <p class="tagline">The open claim-history layer<br>for public knowledge.</p>
+        <p class="tagline">A deterministic observation engine<br>for revision histories.</p>
         <div class="sidebar-search">
           <button class="search-trigger" id="search-trigger" aria-label="Search documentation">
             <svg class="search-icon" viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">

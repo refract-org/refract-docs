@@ -1,7 +1,7 @@
 # Concepts
 
-Refract is the open claim-history layer for public knowledge. It ingests revision histories
-from MediaWiki instances and produces a deterministic event stream showing how claims
+Refract is a deterministic observation engine for revision histories. It ingests them
+from MediaWiki instances and produces an event stream showing how claims
 enter, change, stabilize, and exit the public record — where they came from, what supported
 them, what challenged them, and when context altered their meaning.
 

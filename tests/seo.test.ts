@@ -9,7 +9,7 @@ const ROOT_DIR = resolve(__dirname, "..");
 const DIST_DIR = join(ROOT_DIR, "dist");
 const SITE_URL = "https://refract-org.github.io/refract-docs/";
 const SITE_DESCRIPTION =
-	"Refract — the open claim-history layer for public knowledge. Deterministic event stream of claims, sources, and disputes across revision histories.";
+	"A deterministic observation engine for revision histories. It reads a page's edits and emits a typed event for each change.";
 // Pages that use the site description: the home page by design, and pages with
 // no prose paragraph to describe them (the build logs these).
 const SITE_DESCRIPTION_PAGES = ["glossary", "index"];
@@ -111,7 +111,10 @@ describe("technical SEO", () => {
 		for (const { slug, title, html } of pages) {
 			const h1 = html.match(/<h1 [^>]*>([\s\S]*?)<\/h1>/)?.[1] ?? "";
 			expect(title, slug).toBe(textOf(h1));
-			expect(html, slug).toContain(`<title>${title} — Refract</title>`);
+			const documentTitle = title.startsWith("Refract")
+				? title
+				: `${title} — Refract`;
+			expect(html, slug).toContain(`<title>${documentTitle}</title>`);
 		}
 		const crossWiki = pages.find((page) =>
 			page.slug.endsWith("cross-wiki-diff"),

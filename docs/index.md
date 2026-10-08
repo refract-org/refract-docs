@@ -1,4 +1,4 @@
-# Refract: deterministic observation layer for model evaluation
+# Refract: deterministic observation engine for revision histories
 
 **Refract reveals how claims change across public revision histories — and gives AI researchers reproducible evidence for model evaluation.**
 
