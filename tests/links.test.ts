@@ -1,15 +1,17 @@
 import { execFile } from "node:child_process";
-import { existsSync } from "node:fs";
+import { existsSync, statSync } from "node:fs";
 import { readdir, readFile, stat } from "node:fs/promises";
 import { basename, dirname, join, resolve } from "node:path";
 import { promisify } from "node:util";
 import { marked } from "marked";
 import { beforeAll, describe, expect, it } from "vitest";
+import { rewriteLink } from "../build.mjs";
 
 const ROOT_DIR = resolve(__dirname, "..");
 const DOCS_DIR = join(ROOT_DIR, "docs");
 const DIST_DIR = join(ROOT_DIR, "dist");
 const SITE_BASE = "/refract-docs";
+const SITE_URL = `https://refract-org.github.io${SITE_BASE}/`;
 const execFileAsync = promisify(execFile);
 
 // Helper to recursively find all .md files
@@ -211,27 +213,36 @@ function escapeRegExp(value: string): string {
 	return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
-async function checkGeneratedLink(
-	sourceFile: string,
-	href: string,
-): Promise<{ isValid: boolean; resolvedPath: string }> {
-	if (isExternalLink(href) || href.startsWith("#")) {
-		return { isValid: true, resolvedPath: href };
-	}
+// The URL path a link in a built page points at ("/refract-docs/cli/"), or
+// null for an external link or a same-page anchor. Absolute links to the
+// published site, such as the canonical URL, count as internal.
+function sitePathOf(sourceFile: string, href: string): string | null {
+	const local = href.startsWith(SITE_URL)
+		? href.slice(SITE_URL.length - SITE_BASE.length - 1)
+		: href;
+	if (isExternalLink(local) || local.startsWith("#")) return null;
 
-	const [pathAndQuery, hash] = href.split("#");
-	const [pathPart] = pathAndQuery.split("?");
-	if (!pathPart) {
-		return { isValid: true, resolvedPath: href };
-	}
+	const [pathPart] = local.split(/[?#]/);
+	if (!pathPart) return null;
 
 	const relativeDir = dirname(sourceFile)
 		.replace(DIST_DIR, "")
 		.replaceAll("\\", "/");
 	const pagePath = `${SITE_BASE}${relativeDir === "/" ? "" : relativeDir}/`;
-	const urlPath = normalizeUrlPath(
+	return normalizeUrlPath(
 		pathPart.startsWith("/") ? pathPart : `${pagePath}${pathPart}`,
 	);
+}
+
+async function checkGeneratedLink(
+	sourceFile: string,
+	href: string,
+): Promise<{ isValid: boolean; resolvedPath: string }> {
+	const urlPath = sitePathOf(sourceFile, href);
+	if (urlPath === null) {
+		return { isValid: true, resolvedPath: href };
+	}
+	const hash = href.split("#")[1];
 
 	if (!(urlPath === `${SITE_BASE}/` || urlPath.startsWith(`${SITE_BASE}/`))) {
 		return { isValid: false, resolvedPath: urlPath };
@@ -321,5 +332,90 @@ describe("Generated site links", async () => {
 			invalidLinks,
 			`Found broken generated links:\n${invalidLinks.join("\n")}`,
 		).toEqual([]);
+	});
+
+	// GitHub Pages serves dist/<slug>/index.html at <slug>/ and answers the
+	// slash-less <slug> with a 301 redirect.
+	it("links to pages at their trailing-slash URL, so no internal link redirects", async () => {
+		const redirects: string[] = [];
+		let checked = 0;
+
+		for (const file of await findHtmlFiles(DIST_DIR)) {
+			const html = await readFile(file, "utf-8");
+			for (const href of extractLinks(html)) {
+				const urlPath = sitePathOf(file, href);
+				if (urlPath === null) continue;
+				checked++;
+				if (urlPath.endsWith("/")) continue;
+				const diskPath = join(DIST_DIR, urlPath.slice(SITE_BASE.length));
+				if (existsSync(diskPath) && statSync(diskPath).isDirectory()) {
+					redirects.push(`${file.replace(`${DIST_DIR}/`, "")}: ${href}`);
+				}
+			}
+		}
+
+		expect(checked).toBeGreaterThan(100);
+		expect(
+			redirects,
+			`These internal links redirect:\n${redirects.join("\n")}`,
+		).toEqual([]);
+	});
+});
+
+describe("rewriteLink", () => {
+	it.each([
+		["cli", "", "/refract-docs/cli/"],
+		["./cli", "", "/refract-docs/cli/"],
+		["cli/", "", "/refract-docs/cli/"],
+		["cli.md", "", "/refract-docs/cli/"],
+		[
+			"schema#version-compatibility",
+			"",
+			"/refract-docs/schema/#version-compatibility",
+		],
+		[
+			"schema.md#version-compatibility",
+			"",
+			"/refract-docs/schema/#version-compatibility",
+		],
+		["tutorials/refract-ui", "", "/refract-docs/tutorials/refract-ui/"],
+		["fandom-canon.md", "tutorials", "/refract-docs/tutorials/fandom-canon/"],
+		["../analytics.md", "tutorials", "/refract-docs/analytics/"],
+		["../index.md", "tutorials", "/refract-docs/"],
+		["index.md", "", "/refract-docs/"],
+		["./", "", "/refract-docs/"],
+		["/quickstart", "tutorials", "/refract-docs/quickstart/"],
+		["cli?x=1", "", "/refract-docs/cli/?x=1"],
+	])("links %s (from docs/%s) to the page URL %s", (href, dir, expected) => {
+		expect(rewriteLink(href, dir)).toBe(expected);
+	});
+
+	it.each([
+		["mcp-sequence.svg", "", "/refract-docs/mcp-sequence.svg"],
+		[
+			"assets/refract-ui-screenshot.png",
+			"",
+			"/refract-docs/assets/refract-ui-screenshot.png",
+		],
+		[
+			"notebooks/model-evaluation.ipynb",
+			"",
+			"/refract-docs/notebooks/model-evaluation.ipynb",
+		],
+		["../boundary.svg", "tutorials", "/refract-docs/boundary.svg"],
+	])(
+		"leaves the asset link %s (from docs/%s) without a slash",
+		(href, dir, expected) => {
+			expect(rewriteLink(href, dir)).toBe(expected);
+		},
+	);
+
+	it.each([
+		"https://example.org/page",
+		"http://example.org",
+		"mailto:docs@example.org",
+		"#anchor",
+	])("leaves %s unchanged", (href) => {
+		expect(rewriteLink(href)).toBe(href);
 	});
 });

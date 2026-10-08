@@ -1,4 +1,5 @@
 import { execFileSync } from "node:child_process";
+import { realpathSync } from "node:fs";
 import { cp, mkdir, readdir, readFile, rm, writeFile } from "node:fs/promises";
 import { basename, dirname, join, posix } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -624,24 +625,27 @@ function wrapHTML(title, description, content, currentSlug, headings = []) {
 </html>`;
 }
 
-function rewriteLink(href, sourceDir = "") {
+// Resolves a markdown link against the source file's directory. A link to a
+// page (`cli.md`, `cli`, `./cli/`, `../index.md`) becomes the page's
+// trailing-slash URL, so it never 301-redirects. A path whose last segment has
+// a file extension (`.svg`, `.png`, `.ipynb`) is an asset and keeps its form.
+export function rewriteLink(href, sourceDir = "") {
 	if (!href) return href;
-	if (href.startsWith("http") || href.startsWith("#")) return href;
+	if (/^[a-z][a-z\d+.-]*:/i.test(href) || href.startsWith("#")) return href;
 
 	const [, rawPath = "", suffix = ""] = href.match(/^([^?#]*)([?#].*)?$/) ?? [];
 	if (!rawPath) return href;
 
-	let path = rawPath.replace(/\.md$/, "/");
-	if (sourceDir && !path.startsWith("/")) {
-		path = `${sourceDir}/${path}`;
+	const path = posix
+		.normalize(
+			rawPath.startsWith("/") ? rawPath : posix.join("/", sourceDir, rawPath),
+		)
+		.replace(/^\/+|\/+$/g, "");
+	if (posix.extname(path) && !path.endsWith(".md")) {
+		return `${BASE}${path}${suffix}`;
 	}
-
-	path = posix.normalize(path);
-	if (path === "." || path === "index") return `${BASE}${suffix}`;
-	if (path === "index/") return `${BASE}${suffix}`;
-
-	const normalizedPath = path.startsWith("/") ? path.slice(1) : path;
-	return `${BASE}${normalizedPath}${suffix}`;
+	const slug = path.replace(/\.md$/, "").replace(/(^|\/)index$/, "");
+	return `${slugHref(slug || "index")}${suffix}`;
 }
 
 async function collectFiles(dir, base = "") {
@@ -768,7 +772,14 @@ async function build() {
 	}
 }
 
-build().catch((err) => {
-	console.error(err);
-	process.exit(1);
-});
+// Build only when run as a script, so tests can import rewriteLink. Both sides
+// are real paths, so a symlinked checkout still builds.
+if (
+	process.argv[1] &&
+	realpathSync(process.argv[1]) === fileURLToPath(import.meta.url)
+) {
+	build().catch((err) => {
+		console.error(err);
+		process.exit(1);
+	});
+}
