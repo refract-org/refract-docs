@@ -9,6 +9,15 @@ const DOCS_DIR = join(__dirname, "docs");
 const DIST_DIR = join(__dirname, "dist");
 const ASSETS_DIR = join(__dirname, "assets");
 const BASE = process.env.BASE || "/refract-docs/";
+// Absolute address of the published site. Canonical URLs, og:url, JSON-LD
+// and the sitemap point here even when BASE is overridden for a local build.
+const SITE_URL = (
+	process.env.SITE_URL || "https://refract-org.github.io/refract-docs/"
+).replace(/\/?$/, "/");
+const SITE_NAME = "Refract";
+const SITE_DESCRIPTION =
+	"Refract — the open claim-history layer for public knowledge. Deterministic event stream of claims, sources, and disputes across revision histories.";
+const SOURCE_REPOSITORY = "https://github.com/refract-org/refract";
 
 function assetVersion() {
 	if (process.env.GITHUB_SHA) return process.env.GITHUB_SHA.slice(0, 12);
@@ -28,7 +37,7 @@ const ASSET_VERSION = assetVersion();
 
 let NAV = [];
 
-function resolveTitle(slug) {
+function resolveTitle(slug, fallback = basename(slug)) {
 	for (const item of NAV) {
 		if (item.slug === slug) return item.title;
 		if (item.children) {
@@ -37,11 +46,113 @@ function resolveTitle(slug) {
 			}
 		}
 	}
-	return basename(slug);
+	return fallback;
 }
 
-function slugHref(slug) {
-	return slug === "index" ? BASE : `${BASE}${slug}/`;
+// GitHub Pages serves dist/<slug>/index.html at <slug>/ and 301-redirects the
+// slash-less form, so the trailing-slash URL is the one to link and canonicalize.
+function slugHref(slug, base = BASE) {
+	return slug === "index" ? base : `${base}${slug}/`;
+}
+
+// Safe in HTML attribute values and in XML text alike.
+function escapeMarkup(text) {
+	return text
+		.replace(/&/g, "&amp;")
+		.replace(/</g, "&lt;")
+		.replace(/>/g, "&gt;")
+		.replace(/"/g, "&quot;")
+		.replace(/'/g, "&#39;");
+}
+
+function structuredData(title, slug) {
+	const url = slugHref(slug, SITE_URL);
+	const website = {
+		"@type": "WebSite",
+		"@id": `${SITE_URL}#website`,
+		name: SITE_NAME,
+		url: SITE_URL,
+	};
+	if (slug === "index") {
+		return {
+			"@context": "https://schema.org",
+			"@graph": [
+				{
+					...website,
+					description: SITE_DESCRIPTION,
+					inLanguage: "en",
+					about: { "@id": `${SITE_URL}#source` },
+				},
+				{
+					"@type": "SoftwareSourceCode",
+					"@id": `${SITE_URL}#source`,
+					name: SITE_NAME,
+					codeRepository: SOURCE_REPOSITORY,
+				},
+			],
+		};
+	}
+	return {
+		"@context": "https://schema.org",
+		"@graph": [
+			{
+				"@type": "TechArticle",
+				"@id": `${url}#article`,
+				headline: title,
+				description: SITE_DESCRIPTION,
+				url,
+				mainEntityOfPage: url,
+				inLanguage: "en",
+				isPartOf: website,
+			},
+			{
+				"@type": "BreadcrumbList",
+				itemListElement: [
+					{
+						"@type": "ListItem",
+						position: 1,
+						name: resolveTitle("index"),
+						item: SITE_URL,
+					},
+					{
+						"@type": "ListItem",
+						position: 2,
+						name: resolveTitle(slug, title),
+						item: url,
+					},
+				],
+			},
+		],
+	};
+}
+
+function renderSeoHead(title, slug) {
+	const url = escapeMarkup(slugHref(slug, SITE_URL));
+	// "<" is escaped so no title can close the script element early.
+	const jsonLd = JSON.stringify(structuredData(title, slug)).replace(
+		/</g,
+		"\\u003c",
+	);
+	return `<link rel="canonical" href="${url}">
+  <meta property="og:type" content="${slug === "index" ? "website" : "article"}">
+  <meta property="og:site_name" content="${SITE_NAME}">
+  <meta property="og:title" content="${escapeMarkup(title)}">
+  <meta property="og:description" content="${escapeMarkup(SITE_DESCRIPTION)}">
+  <meta property="og:url" content="${url}">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">${jsonLd}</script>`;
+}
+
+function renderSitemap(slugs) {
+	const urls = slugs.map((slug) => slugHref(slug, SITE_URL)).sort();
+	const entries = urls
+		.map((url) => `  <url><loc>${escapeMarkup(url)}</loc></url>`)
+		.join("\n");
+	return `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+${entries}
+</urlset>
+`;
 }
 
 function renderNav(currentSlug) {
@@ -129,7 +240,8 @@ function wrapHTML(title, content, currentSlug, headings = []) {
   <title>${title} — Refract</title>
   <link rel="stylesheet" href="${BASE}style.css?v=${ASSET_VERSION}">
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><style>path{fill:%2307090f}@media (prefers-color-scheme:dark){path{fill:%23e2e4ed}}</style><path d='M8 2 15 14H1z'/></svg>">
-  <meta name="description" content="Refract — the open claim-history layer for public knowledge. Deterministic event stream of claims, sources, and disputes across revision histories.">
+  <meta name="description" content="${SITE_DESCRIPTION}">
+  ${renderSeoHead(title, currentSlug)}
 </head>
 <body>
   <div id="progress" aria-hidden="true"></div>
@@ -589,6 +701,12 @@ async function build() {
 	await writeFile(
 		join(DIST_DIR, "search-index.json"),
 		JSON.stringify(searchIndex, null, 2),
+	);
+	// No <lastmod>: the deploy checkout is shallow, so git history cannot date
+	// individual pages there.
+	await writeFile(
+		join(DIST_DIR, "sitemap.xml"),
+		renderSitemap(files.map((file) => file.slug)),
 	);
 
 	for (const asset of assets) {
