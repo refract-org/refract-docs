@@ -1,34 +1,49 @@
-# Refract vs. Wikipedia's page history
+# Wikipedia history tools compared
 
-If you're evaluating whether Refract is worth adopting, this page compares what you
-get from Wikipedia's built-in tools vs. what Refract adds.
+This page compares tools for reading a Wikipedia article's history: the built-in page history, XTools, WikiBlame, Who Wrote That? and Refract.
+
+Each answers a different question:
+
+- the page history lists every edit with its editor, timestamp, edit summary and diff;
+- XTools reports statistics about a page's edits and each editor's share of the current text;
+- WikiBlame finds the revision in which a given text was inserted or removed;
+- Who Wrote That? highlights who wrote each part of the current text;
+- Refract reports each change between revisions as a typed event (sentences, citations, templates, reverts, sections), without editor identity.
 
 ## Wikipedia's page history
 
-| Capability | Wikipedia UI | Refract |
+Sources: [Help:Page history](https://en.wikipedia.org/wiki/Help:Page_history),
+[Manual:Reverts](https://www.mediawiki.org/wiki/Manual:Reverts),
+[API:Revisions](https://www.mediawiki.org/wiki/API:Revisions),
+[Help:Watchlist](https://en.wikipedia.org/wiki/Help:Watchlist).
+
+| Capability | Page history | Refract |
 |---|---|---|
 | **View a single revision diff** | Yes — click "prev" on any revision | Yes — every event carries `before`/`after` snapshots |
 | **See who edited what** | Yes — username + timestamp per revision | No — Refract observes document change, not editor identity |
-| **Find when a sentence first appeared** | Manual — search each revision sequentially | `refract claim "Page" --text "sentence"` → exact revision + timestamp |
+| **Find when a sentence first appeared** | Not built in — on English Wikipedia, the history page's "Find addition/removal" link opens WikiBlame | `refract claim "Page" --text "sentence"` → exact revision + timestamp |
 | **Track a sentence across its entire lifecycle** | Manual — follow the page history | Automatic — first seen, modified, removed, reintroduced, all timestamped |
 | **Detect citation swapping** | Manual — compare each diff's reference section | `citation_replaced` event — `before`/`after` show the old and new source |
-| **Detect edit wars** | Manual — look for back-and-forth in history | `revert_detected` + `edit_cluster_detected` — automatic structural detection |
+| **Detect edit wars** | Partly — undos, rollbacks and manual reverts are tagged, and so are the edits they revert; spotting back-and-forth is manual | `revert_detected` + `edit_cluster_detected` — automatic structural detection |
 | **Correlate article edits with talk page discussion** | Manual — check Talk tab separately | `talk_page_correlated` — Refract checks 7 days before / 3 days after each edit |
 | **Compare the same topic across language editions** | Manual — open each wiki separately | `refract diff` — cross-wiki comparison with z-score outlier detection |
 | **Query with SQL** | No | DuckDB: `SELECT "eventType", count(*) FROM 'events.jsonl' GROUP BY 1` |
-| **Hash an export so others can check it** | No — screenshots are the only record | `refract export --manifest` → Merkle root over the event hashes; the same version over the same revision range reproduces it |
-| **Automated monitoring** | No — you check manually | `refract cron` + `refract watch` → Slack, email, webhook alerts |
+| **Hash an export so others can check it** | Per revision — each revision has a permanent link, and the API returns a SHA-1 of its content | `refract export --manifest` → Merkle root over the event hashes; the same version over the same revision range reproduces it |
+| **Automated monitoring** | Watchlist, with optional email when any watched page changes | `refract cron` + `refract watch` → Slack, email, webhook alerts |
 | **AI agent integration** | No | `refract mcp` → Claude Code, Cursor, VS Code can call Refract tools directly |
 
 ## Refract vs. other tools
 
 | Tool | What it does | Refract's difference |
 |---|---|---|
-| **Wikipedia API** | Raw revision data | Refract adds deterministic analysis, event typing, provenance metadata |
-| **WikiWho** | Editor-level authorship attribution | Refract tracks claim lifecycle, not editor attribution. Different question. |
-| **WhoColor / WikiBlame** | Visual diff highlighting | Refract structures the data for querying, not just viewing |
-| **Wikimedia Enterprise** | Bulk API access, commercial licensing | Refract is open-source, deterministic, and runs locally |
-| **Internet Archive** | Historical snapshots | Refract produces structured, queryable event streams, not page captures |
+| **[XTools](https://www.mediawiki.org/wiki/XTools)** | [Page History](https://www.mediawiki.org/wiki/XTools/Page_History): statistics about a page's edits, such as top editors and edits per year and month. [Authorship](https://www.mediawiki.org/wiki/XTools/Authorship): each editor's share of the current text, by character count. [Blame](https://www.mediawiki.org/wiki/XTools/Blame): the edits that added a given text. Authorship and Blame use WikiWho | Refract reports each change between revisions as a typed event and does not attribute text to editors |
+| **[WikiBlame](https://en.wikipedia.org/wiki/User:Flominator/WikiBlame)** | Searches a page's revisions, by binary or linear search, for the one in which a given text was inserted or removed. Works on MediaWiki wikis | `refract claim` follows one sentence through every revision: first seen, modified, removed, reintroduced |
+| **[Who Wrote That?](https://www.mediawiki.org/wiki/Who_Wrote_That%3F)** | Browser extension for Chrome and Firefox that highlights who wrote each part of an article's current text, using WikiWho | Refract does not identify editors; it reports what changed at each revision |
+| **[WikiWho](https://www.mediawiki.org/wiki/WikiWho)** | Token-level provenance for about 70 Wikipedia editions: who added, removed or reinserted each token, and in which revision | Refract emits events for sentences, citations, templates, reverts and sections rather than tokens, and does not attribute editors |
+| **[WhoColor](https://github.com/wikiwho/WhoColor)** | Userscript that colors article text by author, with conflict and age views, built on WikiWho | Refract structures the data for querying, not just viewing |
+| **[Wikimedia Enterprise](https://meta.wikimedia.org/wiki/Wikimedia_Enterprise/FAQ)** | APIs that deliver Wikimedia project content: daily project snapshots, single articles on demand, and a real-time stream of updates. Free access, and paid plans with service-level agreements | Refract analyzes a page's past revisions, is open-source, and runs locally |
+| **[MediaWiki API](https://www.mediawiki.org/wiki/API:Revisions)** | Raw revision data: metadata, content and a SHA-1 of each revision | Refract adds deterministic analysis, event typing, provenance metadata |
+| **[Internet Archive](https://help.archive.org/help/wayback-machine-general-information/)** | Archived captures of web pages from its crawls | Refract produces structured, queryable event streams, not page captures |
 | **Custom scrapers** | Ad-hoc revision analysis | Refract has 26 event types, deterministic hashing, and a published SDK |
 
 ## What Refract deliberately doesn't do
@@ -71,4 +86,4 @@ Refract's model evaluation capability — temporal leakage detection, provenance
 - You need to see **who** made an edit
 - You're browsing page history casually
 
-Refract doesn't replace Wikipedia's UI. It adds capabilities that the UI can't provide — deterministic reproducibility, SQL queryability, hashed exports, and automated monitoring.
+Refract doesn't replace the page history. It adds typed change events, SQL queries over them, exports that others can reproduce from the same revisions, and scheduled re-observation with Slack, email or webhook notifications.

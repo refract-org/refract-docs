@@ -284,7 +284,7 @@ function wrapHTML(title, description, content, currentSlug, headings = []) {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>${documentTitle(title)}</title>
+  <title>${escapeMarkup(documentTitle(title))}</title>
   <link rel="stylesheet" href="${BASE}style.css?v=${ASSET_VERSION}">
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><style>path{fill:%2307090f}@media (prefers-color-scheme:dark){path{fill:%23e2e4ed}}</style><path d='M8 2 15 14H1z'/></svg>">
   <meta name="description" content="${escapeMarkup(description)}">

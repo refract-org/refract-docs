@@ -132,7 +132,8 @@ describe("technical SEO", () => {
 			const documentTitle = title.startsWith("Refract")
 				? title
 				: `${title} — Refract`;
-			expect(html, slug).toContain(`<title>${documentTitle}</title>`);
+			const titleElement = html.match(/<title>([^<]*)<\/title>/)?.[1] ?? "";
+			expect(decodeEntities(titleElement), slug).toBe(documentTitle);
 		}
 		const crossWiki = pages.find((page) =>
 			page.slug.endsWith("cross-wiki-diff"),
@@ -246,11 +247,19 @@ describe("technical SEO", () => {
 		expect(png.length).toBeLessThan(500_000);
 	});
 
-	it("escapes titles in attributes and JSON-LD", () => {
-		const compare = pages.find((page) => page.slug === "compare");
-		expect(compare?.title).toContain("'");
-		expect(compare?.html).toContain("Wikipedia&#39;s page history");
+	it("escapes titles in the title element, attributes and JSON-LD", () => {
+		const mcp = pages.find((page) => page.slug === "mcp");
+		expect(mcp?.title).toContain("&");
+		expect(mcp?.html).toContain("<title>Wikipedia &amp; MediaWiki");
+		expect(mcp?.html).toContain(
+			'<meta property="og:title" content="Wikipedia &amp; MediaWiki',
+		);
 		for (const { slug, html } of pages) {
+			const head = html
+				.slice(0, html.indexOf("</head>"))
+				.replace(/<script[\s\S]*?<\/script>/g, "");
+			// Outside scripts, every "&" in the head starts a character reference.
+			expect(head, slug).not.toMatch(/&(?![a-z]+;|#\d+;)/);
 			for (const [, json] of html.matchAll(
 				/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g,
 			)) {

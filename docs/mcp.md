@@ -1,4 +1,4 @@
-# MCP — Model Context Protocol
+# Wikipedia & MediaWiki revision-history MCP server
 
 `refract mcp` starts a JSON-RPC server over stdio that exposes the Refract engine to AI agents via the Model Context Protocol. (`wikihistory mcp` also works.)
 
