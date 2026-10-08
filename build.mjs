@@ -4,6 +4,7 @@ import { cp, mkdir, readdir, readFile, rm, writeFile } from "node:fs/promises";
 import { basename, dirname, join, posix } from "node:path";
 import { fileURLToPath } from "node:url";
 import { marked } from "marked";
+import { CARD_HEIGHT, CARD_WIDTH, renderSocialCard } from "./social-card.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const DOCS_DIR = join(__dirname, "docs");
@@ -19,6 +20,10 @@ const SITE_NAME = "Refract";
 const SITE_DESCRIPTION =
 	"A deterministic observation engine for revision histories. It reads a page's edits and emits a typed event for each change.";
 const SOURCE_REPOSITORY = "https://github.com/refract-org/refract";
+// One Open Graph card for every page, rendered at build time from the name
+// and description above.
+const SOCIAL_CARD_FILE = "social-card.png";
+const SOCIAL_CARD_ALT = `${SITE_NAME}. ${SITE_DESCRIPTION}`;
 
 function assetVersion() {
 	if (process.env.GITHUB_SHA) return process.env.GITHUB_SHA.slice(0, 12);
@@ -139,7 +144,11 @@ function renderSeoHead(title, description, slug) {
   <meta property="og:title" content="${escapeMarkup(title)}">
   <meta property="og:description" content="${escapeMarkup(description)}">
   <meta property="og:url" content="${url}">
-  <meta name="twitter:card" content="summary">
+  <meta property="og:image" content="${escapeMarkup(`${SITE_URL}${SOCIAL_CARD_FILE}`)}">
+  <meta property="og:image:width" content="${CARD_WIDTH}">
+  <meta property="og:image:height" content="${CARD_HEIGHT}">
+  <meta property="og:image:alt" content="${escapeMarkup(SOCIAL_CARD_ALT)}">
+  <meta name="twitter:card" content="summary_large_image">
   <script type="application/ld+json">${jsonLd}</script>`;
 }
 
@@ -753,6 +762,14 @@ async function build() {
 	await writeFile(
 		join(DIST_DIR, "sitemap.xml"),
 		renderSitemap(files.map((file) => file.slug)),
+	);
+	await writeFile(
+		join(DIST_DIR, SOCIAL_CARD_FILE),
+		renderSocialCard({
+			name: SITE_NAME,
+			description: SITE_DESCRIPTION,
+			address: SITE_URL.replace(/^https?:\/\//, "").replace(/\/$/, ""),
+		}),
 	);
 
 	for (const asset of assets) {
