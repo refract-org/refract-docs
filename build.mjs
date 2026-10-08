@@ -65,7 +65,7 @@ function escapeMarkup(text) {
 		.replace(/'/g, "&#39;");
 }
 
-function structuredData(title, slug) {
+function structuredData(title, description, slug) {
 	const url = slugHref(slug, SITE_URL);
 	const website = {
 		"@type": "WebSite",
@@ -79,7 +79,7 @@ function structuredData(title, slug) {
 			"@graph": [
 				{
 					...website,
-					description: SITE_DESCRIPTION,
+					description,
 					inLanguage: "en",
 					about: { "@id": `${SITE_URL}#source` },
 				},
@@ -99,7 +99,7 @@ function structuredData(title, slug) {
 				"@type": "TechArticle",
 				"@id": `${url}#article`,
 				headline: title,
-				description: SITE_DESCRIPTION,
+				description,
 				url,
 				mainEntityOfPage: url,
 				inLanguage: "en",
@@ -126,18 +126,17 @@ function structuredData(title, slug) {
 	};
 }
 
-function renderSeoHead(title, slug) {
+function renderSeoHead(title, description, slug) {
 	const url = escapeMarkup(slugHref(slug, SITE_URL));
 	// "<" is escaped so no title can close the script element early.
-	const jsonLd = JSON.stringify(structuredData(title, slug)).replace(
-		/</g,
-		"\\u003c",
-	);
+	const jsonLd = JSON.stringify(
+		structuredData(title, description, slug),
+	).replace(/</g, "\\u003c");
 	return `<link rel="canonical" href="${url}">
   <meta property="og:type" content="${slug === "index" ? "website" : "article"}">
   <meta property="og:site_name" content="${SITE_NAME}">
   <meta property="og:title" content="${escapeMarkup(title)}">
-  <meta property="og:description" content="${escapeMarkup(SITE_DESCRIPTION)}">
+  <meta property="og:description" content="${escapeMarkup(description)}">
   <meta property="og:url" content="${url}">
   <meta name="twitter:card" content="summary">
   <script type="application/ld+json">${jsonLd}</script>`;
@@ -179,13 +178,67 @@ function renderNav(currentSlug) {
 	return html;
 }
 
-function plainText(tokens) {
+function plainText(tokens, skipTypes = []) {
 	return tokens
 		.map((token) => {
-			if (token.tokens) return plainText(token.tokens);
+			if (skipTypes.includes(token.type)) return "";
+			if (token.tokens) return plainText(token.tokens, skipTypes);
 			return token.text ?? token.raw ?? "";
 		})
 		.join("");
+}
+
+// Inline text of a heading or paragraph with markdown, HTML tags and images
+// removed and whitespace collapsed.
+function inlineText(tokens) {
+	return plainText(tokens, ["html", "image"]).replace(/\s+/g, " ").trim();
+}
+
+function pageTitle(tokens, slug) {
+	const h1 = tokens.find((t) => t.type === "heading" && t.depth === 1);
+	return h1 ? inlineText(h1.tokens) : resolveTitle(slug);
+}
+
+const DESCRIPTION_LENGTH = 155;
+
+function truncateAtWord(text, max) {
+	if (text.length <= max) return text;
+	const cut = text.slice(0, max + 1);
+	const end = cut.lastIndexOf(" ");
+	return `${cut.slice(0, end > 0 ? end : max).replace(/[\s,;:—–-]+$/, "")}…`;
+}
+
+// A paragraph can stand in for the page when it is prose that ends a sentence.
+// That rules out lead-ins to the next block ("Use environment variables
+// instead:"), bold-label callouts ("**Note**: …", glossary-style
+// "**Term** — …"), parenthetical asides, "See [page]" pointers and images.
+function isSummaryParagraph(token, text) {
+	if (!/[.!?]["'”’)]*$/.test(text)) return false;
+	if (/^\(.*\)$/.test(text)) return false;
+	const [first, second] = token.tokens;
+	if (
+		first?.type === "strong" &&
+		second &&
+		(/:$/.test(first.text) || /^\s*[:—–]|^\s+-\s/.test(second.raw))
+	) {
+		return false;
+	}
+	return !(/^See\s/.test(text) && token.tokens.some((t) => t.type === "link"));
+}
+
+// The first prose paragraph after the H1, trimmed for a meta description.
+// Only top-level paragraphs count, so lists, tables, code blocks, blockquotes
+// and HTML blocks are skipped. Returns "" when the page has none.
+function pageSummary(tokens) {
+	const h1 = tokens.findIndex((t) => t.type === "heading" && t.depth === 1);
+	for (const token of tokens.slice(h1 + 1)) {
+		if (token.type !== "paragraph") continue;
+		const text = inlineText(token.tokens);
+		if (isSummaryParagraph(token, text)) {
+			return truncateAtWord(text, DESCRIPTION_LENGTH);
+		}
+	}
+	return "";
 }
 
 function slugifyHeading(text) {
@@ -197,28 +250,7 @@ function slugifyHeading(text) {
 		.replace(/\s/g, "-");
 }
 
-function getExcerpt(markdown) {
-	// Remove code blocks
-	let text = markdown.replace(/```[\s\S]*?```/g, "");
-	// Remove inline code tags
-	text = text.replace(/`([^`]+)`/g, "$1");
-	// Remove HTML tags
-	text = text.replace(/<[^>]*>/g, "");
-	// Remove markdown links
-	text = text.replace(/\[([^\]]+)\]\([^)]+\)/g, "$1");
-	// Remove headings
-	text = text.replace(/^#+\s+.+$/gm, "");
-	// Get first non-empty lines
-	const lines = text
-		.split("\n")
-		.map((l) => l.trim())
-		.filter(Boolean);
-	if (lines.length === 0) return "";
-	const firstLine = lines[0];
-	return firstLine.length > 140 ? `${firstLine.slice(0, 137)}...` : firstLine;
-}
-
-function wrapHTML(title, content, currentSlug, headings = []) {
+function wrapHTML(title, description, content, currentSlug, headings = []) {
 	let tocHtml = "";
 	if (headings.length > 0) {
 		tocHtml += `<div class="toc-title">On this page</div>`;
@@ -240,8 +272,8 @@ function wrapHTML(title, content, currentSlug, headings = []) {
   <title>${title} — Refract</title>
   <link rel="stylesheet" href="${BASE}style.css?v=${ASSET_VERSION}">
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><style>path{fill:%2307090f}@media (prefers-color-scheme:dark){path{fill:%23e2e4ed}}</style><path d='M8 2 15 14H1z'/></svg>">
-  <meta name="description" content="${SITE_DESCRIPTION}">
-  ${renderSeoHead(title, currentSlug)}
+  <meta name="description" content="${escapeMarkup(description)}">
+  ${renderSeoHead(title, description, currentSlug)}
 </head>
 <body>
   <div id="progress" aria-hidden="true"></div>
@@ -636,6 +668,7 @@ async function build() {
 	const { files, assets } = await collectFiles(DOCS_DIR);
 
 	const searchIndex = [];
+	const fallbackPages = [];
 	const renderer = new marked.Renderer();
 	let currentSourceDir = "";
 	let currentHeadingCounts = new Map();
@@ -678,9 +711,13 @@ async function build() {
 		currentHeadingCounts = new Map();
 		currentHeadings = [];
 		const body = marked.parse(raw, { renderer });
-		const h1Match = raw.match(/^#\s+(.+)/m);
-		const title = h1Match ? h1Match[1] : resolveTitle(file.slug);
-		const html = wrapHTML(title, body, file.slug, currentHeadings);
+		const tokens = marked.lexer(raw);
+		const title = pageTitle(tokens, file.slug);
+		// The home page keeps the site-wide positioning line.
+		const summary = file.slug === "index" ? "" : pageSummary(tokens);
+		if (file.slug !== "index" && !summary) fallbackPages.push(file.slug);
+		const description = summary || SITE_DESCRIPTION;
+		const html = wrapHTML(title, description, body, file.slug, currentHeadings);
 
 		if (file.slug === "index") {
 			await writeFile(join(DIST_DIR, "index.html"), html);
@@ -693,7 +730,7 @@ async function build() {
 		searchIndex.push({
 			title,
 			slug: file.slug,
-			excerpt: getExcerpt(raw),
+			excerpt: description,
 			headings: currentHeadings.map((h) => ({ text: h.text, id: h.id })),
 		});
 	}
@@ -719,6 +756,11 @@ async function build() {
 	console.log(
 		`Built ${files.length} pages and copied ${assets.length} assets to dist/`,
 	);
+	if (fallbackPages.length > 0) {
+		console.log(
+			`No prose paragraph to describe, so these pages use the site description: ${fallbackPages.sort().join(", ")}`,
+		);
+	}
 }
 
 build().catch((err) => {
