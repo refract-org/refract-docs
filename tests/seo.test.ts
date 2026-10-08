@@ -8,6 +8,11 @@ import { beforeAll, describe, expect, it } from "vitest";
 const ROOT_DIR = resolve(__dirname, "..");
 const DIST_DIR = join(ROOT_DIR, "dist");
 const SITE_URL = "https://refract-org.github.io/refract-docs/";
+const SITE_DESCRIPTION =
+	"A deterministic observation engine for revision histories. It reads a page's edits and emits a typed event for each change.";
+// Pages that use the site description: the home page by design, and pages with
+// no prose paragraph to describe them (the build logs these).
+const SITE_DESCRIPTION_PAGES = ["glossary", "index"];
 const execFileAsync = promisify(execFile);
 
 type Page = { slug: string; title: string; html: string };
@@ -31,6 +36,27 @@ function metaContents(html: string, attr: string, key: string): string[] {
 	return Array.from(html.matchAll(pattern), (match) =>
 		decodeEntities(match[1]),
 	);
+}
+
+function descriptionOf(html: string): string {
+	return metaContents(html, "name", "description")[0] ?? "";
+}
+
+// Visible text of an HTML fragment: tags dropped, entities decoded,
+// whitespace collapsed.
+function textOf(fragment: string): string {
+	return decodeEntities(fragment.replace(/<[^>]+>/g, ""))
+		.replace(/\s+/g, " ")
+		.trim();
+}
+
+function stringsIn(value: unknown): string[] {
+	if (typeof value === "string") return [value];
+	if (Array.isArray(value)) return value.flatMap(stringsIn);
+	if (value && typeof value === "object") {
+		return Object.values(value).flatMap(stringsIn);
+	}
+	return [];
 }
 
 function canonicals(html: string): string[] {
@@ -81,12 +107,80 @@ describe("technical SEO", () => {
 		}
 	});
 
-	it("leaves page titles and the meta description as they were", () => {
-		for (const { title, html } of pages) {
-			expect(html).toContain(`<title>${title} — Refract</title>`);
-			expect(metaContents(html, "name", "description")).toEqual([
-				"Refract — the open claim-history layer for public knowledge. Deterministic event stream of claims, sources, and disputes across revision histories.",
-			]);
+	it("titles each page with the visible text of its H1", () => {
+		for (const { slug, title, html } of pages) {
+			const h1 = html.match(/<h1 [^>]*>([\s\S]*?)<\/h1>/)?.[1] ?? "";
+			expect(title, slug).toBe(textOf(h1));
+			const documentTitle = title.startsWith("Refract")
+				? title
+				: `${title} — Refract`;
+			expect(html, slug).toContain(`<title>${documentTitle}</title>`);
+		}
+		const crossWiki = pages.find((page) =>
+			page.slug.endsWith("cross-wiki-diff"),
+		);
+		expect(crossWiki?.title).toBe(
+			"Tutorial: Cross-wiki comparison with refract diff",
+		);
+	});
+
+	it("keeps the site description on the home page", () => {
+		const home = pages.find((page) => page.slug === "index");
+		expect(descriptionOf(home?.html ?? "")).toBe(SITE_DESCRIPTION);
+	});
+
+	it("gives each doc page its own description, apart from listed fallbacks", () => {
+		const fallbacks = pages
+			.filter(({ html }) => descriptionOf(html) === SITE_DESCRIPTION)
+			.map(({ slug }) => slug)
+			.sort();
+		expect(fallbacks).toEqual(SITE_DESCRIPTION_PAGES);
+
+		const descriptions = pages
+			.filter(({ slug }) => !SITE_DESCRIPTION_PAGES.includes(slug))
+			.map(({ html }) => descriptionOf(html));
+		expect(new Set(descriptions).size).toBe(descriptions.length);
+	});
+
+	it("takes each description from the page's own text, cut at a word boundary", () => {
+		for (const { slug, html } of pages) {
+			if (SITE_DESCRIPTION_PAGES.includes(slug)) continue;
+			const description = descriptionOf(html);
+			const main = html.match(/<main class="content">([\s\S]*?)<\/main>/);
+			const body = textOf(main?.[1] ?? "");
+			const cut = description.endsWith("…");
+			const prefix = cut ? description.slice(0, -1) : description;
+			const at = body.indexOf(prefix);
+
+			expect(at, `${slug}: ${description}`).toBeGreaterThanOrEqual(0);
+			if (cut) {
+				expect(body[at + prefix.length], slug).toMatch(/[^\p{L}\p{N}]/u);
+			}
+		}
+	});
+
+	it("keeps every description to 160 characters or fewer", () => {
+		for (const { slug, html } of pages) {
+			const description = descriptionOf(html);
+			expect(description.length, `${slug}: ${description}`).toBeLessThanOrEqual(
+				160,
+			);
+			expect(description.length, slug).toBeGreaterThan(0);
+		}
+	});
+
+	it("leaves no markdown backticks or asterisks in titles or descriptions", () => {
+		for (const { slug, html } of pages) {
+			const texts = [
+				textOf(html.match(/<title>([\s\S]*?)<\/title>/)?.[1] ?? ""),
+				descriptionOf(html),
+				...metaContents(html, "property", "og:title"),
+				...metaContents(html, "property", "og:description"),
+				...stringsIn(jsonLdGraph(html)),
+			];
+			for (const text of texts) {
+				expect(text, slug).not.toMatch(/[`*]/);
+			}
 		}
 	});
 

@@ -1,7 +1,7 @@
 # Why Refract?
 
-Refract is the open claim-history layer for public knowledge: it tells you what changed
-on a page, when, and in which revision.
+Refract is a deterministic observation engine for revision histories: it tells you what
+changed on a page, when, and in which revision.
 
 ## Who this is for
 
