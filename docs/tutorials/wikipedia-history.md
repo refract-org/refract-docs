@@ -3,8 +3,9 @@
 ## Goal
 
 Use Refract to analyze the full revision history of a Wikipedia page and understand what
-changed, when, and what kind of change it was — all deterministically, byte-for-byte
-reproducible.
+changed, when, and what kind of change it was.
+
+The analysis is deterministic, and its output is reproducible byte for byte.
 
 ## Steps
 
