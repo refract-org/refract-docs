@@ -1,6 +1,6 @@
 # Wikipedia & MediaWiki revision-history MCP server
 
-`refract mcp` starts a JSON-RPC server over stdio that exposes the Refract engine to AI agents via the Model Context Protocol. (`wikihistory mcp` also works.)
+`refract mcp` starts a Model Context Protocol server over stdio that lets AI agents analyze page revision histories from Wikipedia or any MediaWiki API.
 
 The MCP server supports **sampling** — it can request the host's LLM to interpret events at any BYO-inference boundary without managing API keys.
 
@@ -12,7 +12,7 @@ The MCP server supports **sampling** — it can request the host's LLM to interp
 refract mcp
 ```
 
-The server starts and waits for MCP client connections on stdio. Connect any MCP-compatible client.
+The server starts and waits for MCP client connections on stdio (`wikihistory mcp` also works). Connect any MCP-compatible client.
 
 ## Connecting AI coding agents
 

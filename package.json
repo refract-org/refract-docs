@@ -18,9 +18,7 @@
 		"test": "vitest run",
 		"lint": "biome check .",
 		"format": "biome format --write .",
-		"prepare": "husky",
-		"assets:check": "bun run scripts/check-assets.ts",
-		"assets:generate": "bun run scripts/generate-scenes.ts"
+		"prepare": "husky"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "^2.5.15",
