@@ -4,6 +4,14 @@ import { readFile } from "node:fs/promises";
 import { join, resolve } from "node:path";
 import { promisify } from "node:util";
 import { beforeAll, describe, expect, it } from "vitest";
+import {
+	CARD_HEIGHT,
+	CARD_WIDTH,
+	MAX_LINES,
+	renderSocialCard,
+	socialCardSvg,
+	wrapText,
+} from "../social-card.mjs";
 
 const ROOT_DIR = resolve(__dirname, "..");
 const DIST_DIR = join(ROOT_DIR, "dist");
@@ -13,10 +21,20 @@ const SITE_DESCRIPTION =
 // Pages that use the site description: the home page by design, and pages with
 // no prose paragraph to describe them (the build logs these).
 const SITE_DESCRIPTION_PAGES = ["glossary", "index"];
+const SOCIAL_CARD_URL = `${SITE_URL}social-card.png`;
 const execFileAsync = promisify(execFile);
 
 type Page = { slug: string; title: string; html: string };
 type JsonLdNode = Record<string, unknown> & { "@type": string };
+
+// Width and height from a PNG's IHDR chunk, after checking the signature.
+function pngSize(png: Buffer): { width: number; height: number } {
+	expect(png.subarray(0, 8)).toEqual(
+		Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]),
+	);
+	expect(png.toString("latin1", 12, 16)).toBe("IHDR");
+	return { width: png.readUInt32BE(16), height: png.readUInt32BE(20) };
+}
 
 function canonicalFor(slug: string): string {
 	return slug === "index" ? SITE_URL : `${SITE_URL}${slug}/`;
@@ -114,7 +132,8 @@ describe("technical SEO", () => {
 			const documentTitle = title.startsWith("Refract")
 				? title
 				: `${title} — Refract`;
-			expect(html, slug).toContain(`<title>${documentTitle}</title>`);
+			const titleElement = html.match(/<title>([^<]*)<\/title>/)?.[1] ?? "";
+			expect(decodeEntities(titleElement), slug).toBe(documentTitle);
 		}
 		const crossWiki = pages.find((page) =>
 			page.slug.endsWith("cross-wiki-diff"),
@@ -200,17 +219,47 @@ describe("technical SEO", () => {
 			expect(metaContents(html, "property", "og:site_name"), slug).toEqual([
 				"Refract",
 			]);
+			expect(metaContents(html, "property", "og:image"), slug).toEqual([
+				SOCIAL_CARD_URL,
+			]);
+			expect(metaContents(html, "property", "og:image:width"), slug).toEqual([
+				String(CARD_WIDTH),
+			]);
+			expect(metaContents(html, "property", "og:image:height"), slug).toEqual([
+				String(CARD_HEIGHT),
+			]);
+			expect(metaContents(html, "property", "og:image:alt"), slug).toEqual([
+				`Refract. ${SITE_DESCRIPTION}`,
+			]);
 			expect(metaContents(html, "name", "twitter:card"), slug).toEqual([
-				"summary",
+				"summary_large_image",
 			]);
 		}
 	});
 
-	it("escapes titles in attributes and JSON-LD", () => {
-		const compare = pages.find((page) => page.slug === "compare");
-		expect(compare?.title).toContain("'");
-		expect(compare?.html).toContain("Wikipedia&#39;s page history");
+	it("publishes the 1200×630 card that og:image points to", async () => {
+		const png = await readFile(
+			join(DIST_DIR, SOCIAL_CARD_URL.slice(SITE_URL.length)),
+		);
+		expect(pngSize(png)).toEqual({ width: 1200, height: 630 });
+		// A flat rectangle compresses to a few kilobytes; rendered text does not.
+		expect(png.length).toBeGreaterThan(20_000);
+		expect(png.length).toBeLessThan(500_000);
+	});
+
+	it("escapes titles in the title element, attributes and JSON-LD", () => {
+		const mcp = pages.find((page) => page.slug === "mcp");
+		expect(mcp?.title).toContain("&");
+		expect(mcp?.html).toContain("<title>Wikipedia &amp; MediaWiki");
+		expect(mcp?.html).toContain(
+			'<meta property="og:title" content="Wikipedia &amp; MediaWiki',
+		);
 		for (const { slug, html } of pages) {
+			const head = html
+				.slice(0, html.indexOf("</head>"))
+				.replace(/<script[\s\S]*?<\/script>/g, "");
+			// Outside scripts, every "&" in the head starts a character reference.
+			expect(head, slug).not.toMatch(/&(?![a-z]+;|#\d+;)/);
 			for (const [, json] of html.matchAll(
 				/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g,
 			)) {
@@ -277,5 +326,48 @@ describe("technical SEO", () => {
 			const diskPath = join(DIST_DIR, loc.slice(SITE_URL.length), "index.html");
 			expect(existsSync(diskPath), loc).toBe(true);
 		}
+	});
+});
+
+describe("social card", () => {
+	const description = SITE_DESCRIPTION;
+
+	it("wraps the description into lines that each fit the card", () => {
+		const lines = wrapText(description);
+		expect(lines.length).toBeGreaterThan(1);
+		expect(lines.length).toBeLessThanOrEqual(MAX_LINES);
+		expect(lines.join(" ")).toBe(description);
+		for (const line of lines) {
+			expect(wrapText(line), line).toEqual([line]);
+		}
+	});
+
+	it("refuses a description too long to fit, instead of clipping it", () => {
+		const long = Array(MAX_LINES + 2)
+			.fill(description)
+			.join(" ");
+		expect(() =>
+			socialCardSvg({ name: "Refract", description: long, address: "x" }),
+		).toThrow(/fits \d+ lines/);
+	});
+
+	it("escapes text for SVG", () => {
+		const svg = socialCardSvg({
+			name: "A & B",
+			description: 'Uses <tags> & "quotes".',
+			address: "example.org/?a=1&b=2",
+		});
+		expect(svg).toContain(">A &amp; B</text>");
+		expect(svg).toContain("Uses &lt;tags&gt; &amp; &quot;quotes&quot;.");
+		expect(svg).toContain("example.org/?a=1&amp;b=2");
+	});
+
+	it("renders a 1200×630 PNG", () => {
+		const png = renderSocialCard({
+			name: "Refract",
+			description,
+			address: "refract-org.github.io/refract-docs",
+		});
+		expect(pngSize(Buffer.from(png))).toEqual({ width: 1200, height: 630 });
 	});
 });

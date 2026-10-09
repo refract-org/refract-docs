@@ -1,8 +1,10 @@
 import { execFileSync } from "node:child_process";
+import { realpathSync } from "node:fs";
 import { cp, mkdir, readdir, readFile, rm, writeFile } from "node:fs/promises";
 import { basename, dirname, join, posix } from "node:path";
 import { fileURLToPath } from "node:url";
 import { marked } from "marked";
+import { CARD_HEIGHT, CARD_WIDTH, renderSocialCard } from "./social-card.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const DOCS_DIR = join(__dirname, "docs");
@@ -18,6 +20,10 @@ const SITE_NAME = "Refract";
 const SITE_DESCRIPTION =
 	"A deterministic observation engine for revision histories. It reads a page's edits and emits a typed event for each change.";
 const SOURCE_REPOSITORY = "https://github.com/refract-org/refract";
+// One Open Graph card for every page, rendered at build time from the name
+// and description above.
+const SOCIAL_CARD_FILE = "social-card.png";
+const SOCIAL_CARD_ALT = `${SITE_NAME}. ${SITE_DESCRIPTION}`;
 
 function assetVersion() {
 	if (process.env.GITHUB_SHA) return process.env.GITHUB_SHA.slice(0, 12);
@@ -138,7 +144,11 @@ function renderSeoHead(title, description, slug) {
   <meta property="og:title" content="${escapeMarkup(title)}">
   <meta property="og:description" content="${escapeMarkup(description)}">
   <meta property="og:url" content="${url}">
-  <meta name="twitter:card" content="summary">
+  <meta property="og:image" content="${escapeMarkup(`${SITE_URL}${SOCIAL_CARD_FILE}`)}">
+  <meta property="og:image:width" content="${CARD_WIDTH}">
+  <meta property="og:image:height" content="${CARD_HEIGHT}">
+  <meta property="og:image:alt" content="${escapeMarkup(SOCIAL_CARD_ALT)}">
+  <meta name="twitter:card" content="summary_large_image">
   <script type="application/ld+json">${jsonLd}</script>`;
 }
 
@@ -274,7 +284,7 @@ function wrapHTML(title, description, content, currentSlug, headings = []) {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>${documentTitle(title)}</title>
+  <title>${escapeMarkup(documentTitle(title))}</title>
   <link rel="stylesheet" href="${BASE}style.css?v=${ASSET_VERSION}">
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><style>path{fill:%2307090f}@media (prefers-color-scheme:dark){path{fill:%23e2e4ed}}</style><path d='M8 2 15 14H1z'/></svg>">
   <meta name="description" content="${escapeMarkup(description)}">
@@ -624,24 +634,27 @@ function wrapHTML(title, description, content, currentSlug, headings = []) {
 </html>`;
 }
 
-function rewriteLink(href, sourceDir = "") {
+// Resolves a markdown link against the source file's directory. A link to a
+// page (`cli.md`, `cli`, `./cli/`, `../index.md`) becomes the page's
+// trailing-slash URL, so it never 301-redirects. A path whose last segment has
+// a file extension (`.svg`, `.png`, `.ipynb`) is an asset and keeps its form.
+export function rewriteLink(href, sourceDir = "") {
 	if (!href) return href;
-	if (href.startsWith("http") || href.startsWith("#")) return href;
+	if (/^[a-z][a-z\d+.-]*:/i.test(href) || href.startsWith("#")) return href;
 
 	const [, rawPath = "", suffix = ""] = href.match(/^([^?#]*)([?#].*)?$/) ?? [];
 	if (!rawPath) return href;
 
-	let path = rawPath.replace(/\.md$/, "/");
-	if (sourceDir && !path.startsWith("/")) {
-		path = `${sourceDir}/${path}`;
+	const path = posix
+		.normalize(
+			rawPath.startsWith("/") ? rawPath : posix.join("/", sourceDir, rawPath),
+		)
+		.replace(/^\/+|\/+$/g, "");
+	if (posix.extname(path) && !path.endsWith(".md")) {
+		return `${BASE}${path}${suffix}`;
 	}
-
-	path = posix.normalize(path);
-	if (path === "." || path === "index") return `${BASE}${suffix}`;
-	if (path === "index/") return `${BASE}${suffix}`;
-
-	const normalizedPath = path.startsWith("/") ? path.slice(1) : path;
-	return `${BASE}${normalizedPath}${suffix}`;
+	const slug = path.replace(/\.md$/, "").replace(/(^|\/)index$/, "");
+	return `${slugHref(slug || "index")}${suffix}`;
 }
 
 async function collectFiles(dir, base = "") {
@@ -750,6 +763,14 @@ async function build() {
 		join(DIST_DIR, "sitemap.xml"),
 		renderSitemap(files.map((file) => file.slug)),
 	);
+	await writeFile(
+		join(DIST_DIR, SOCIAL_CARD_FILE),
+		renderSocialCard({
+			name: SITE_NAME,
+			description: SITE_DESCRIPTION,
+			address: SITE_URL.replace(/^https?:\/\//, "").replace(/\/$/, ""),
+		}),
+	);
 
 	for (const asset of assets) {
 		const dest = join(DIST_DIR, asset.rel);
@@ -768,7 +789,14 @@ async function build() {
 	}
 }
 
-build().catch((err) => {
-	console.error(err);
-	process.exit(1);
-});
+// Build only when run as a script, so tests can import rewriteLink. Both sides
+// are real paths, so a symlinked checkout still builds.
+if (
+	process.argv[1] &&
+	realpathSync(process.argv[1]) === fileURLToPath(import.meta.url)
+) {
+	build().catch((err) => {
+		console.error(err);
+		process.exit(1);
+	});
+}

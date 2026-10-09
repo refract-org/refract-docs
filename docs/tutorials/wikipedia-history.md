@@ -1,4 +1,4 @@
-# Tutorial: Track changes on a Wikipedia page
+# Track changes to a Wikipedia article over time
 
 ## Goal
 
