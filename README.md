@@ -1,10 +1,19 @@
 # Refract Docs
 
+> **This repository has moved.** The documentation source is now
+> [`apps/docs`](https://github.com/refract-org/refract/tree/main/apps/docs) in
+> [refract-org/refract](https://github.com/refract-org/refract), imported with
+> its full history, and the site is published at
+> [refract-org.github.io/refract](https://refract-org.github.io/refract/).
+> Open issues and pull requests there. This repository publishes only redirects:
+> each page under `refract-org.github.io/refract-docs/` sends you to the same
+> page at the new address (see `redirects.mjs`).
+
 Public documentation for [Refract](https://github.com/refract-org/refract), a deterministic observation engine for public revision histories.
 
 ---
 
-**Live at:** [refract-org.github.io/refract-docs](https://refract-org.github.io/refract-docs/)
+**Live at:** [refract-org.github.io/refract](https://refract-org.github.io/refract/)
 
 ## Quick start
 
